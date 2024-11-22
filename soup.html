@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I love soup.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .grid-item {
+            text-align: center;
+        }
+        .grid-item img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .grid-item a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            display: block;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">I love soup.</h1>
+    <div class="grid-container" id="pdfGrid"></div>
+
+    <script>
+        const repoOwner = "celine-lee"; // Replace with your GitHub username
+        const repoName = "soup"; // Replace with your repository name
+        const pdfPath = ""; // Replace with the folder path containing PDFs (if in root, leave as empty string)
+
+        const pdfGrid = document.getElementById('pdfGrid');
+
+        async function fetchPDFs() {
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${pdfPath}`;
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Failed to fetch repository contents");
+                const files = await response.json();
+
+                // Filter for PDFs and create the grid
+                files.filter(file => file.name.endsWith('.pdf')).forEach(file => {
+                    const pdfItem = document.createElement('div');
+                    pdfItem.classList.add('grid-item');
+
+                    // PDF Thumbnail using Google Docs Viewer
+                    const thumbnailUrl = `https://docs.google.com/viewer?url=${file.download_url}&embedded=true`;
+
+                    pdfItem.innerHTML = `
+                        <a href="${file.download_url}" target="_blank">
+                            <img src="${thumbnailUrl}" alt="${file.name}">
+                            <span>${file.name}</span>
+                        </a>
+                    `;
+                    pdfGrid.appendChild(pdfItem);
+                });
+            } catch (error) {
+                console.error("Error fetching PDF files:", error);
+                pdfGrid.innerHTML = `<p style="color: red;">Error loading PDFs. Please try again later.</p>`;
+            }
+        }
+
+        // Fetch PDFs on page load
+        fetchPDFs();
+    </script>
+</body>
+</html>
