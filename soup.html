@@ -19,64 +19,68 @@
         }
         .grid-item {
             text-align: center;
-        }
-        .grid-item img {
-            width: 100%;
-            height: auto;
             border: 1px solid #ccc;
             border-radius: 8px;
+            padding: 10px;
+            background-color: #fff;
+            transition: box-shadow 0.2s;
         }
-        .grid-item a {
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            display: block;
-            margin-top: 8px;
+        .grid-item:hover {
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .grid-item img {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px;
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">I love soup.</h1>
-    <div class="grid-container" id="pdfGrid"></div>
+    <h1>I love soup.</h1>
+    <div class="grid-container" id="imageGrid"></div>
 
     <script>
-        const repoOwner = "celine-lee"; // Replace with your GitHub username
-        const repoName = "soup"; // Replace with your repository name
-        const pdfPath = ""; // Replace with the folder path containing PDFs (if in root, leave as empty string)
+        const thumbnailFolder = "soup/thumbnails"; // Folder containing thumbnails
 
-        const pdfGrid = document.getElementById('pdfGrid');
+        const imageGrid = document.getElementById('imageGrid');
 
-        async function fetchPDFs() {
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${pdfPath}`;
+        // Fetch all images and generate grid items
+        async function loadImages() {
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("Failed to fetch repository contents");
-                const files = await response.json();
+                const response = await fetch(thumbnailFolder);
+                const parser = new DOMParser();
+                const html = parser.parseFromString(await response.text(), "text/html");
 
-                // Filter for PDFs and create the grid
-                files.filter(file => file.name.endsWith('.pdf')).forEach(file => {
-                    const pdfItem = document.createElement('div');
-                    pdfItem.classList.add('grid-item');
+                // Get all image file names from the folder listing
+                const imageFiles = [...html.querySelectorAll('a')]
+                    .map(link => link.href.split('/').pop())
+                    .filter(name => name.endsWith('.png'));
 
-                    // PDF Thumbnail using Google Docs Viewer
-                    const thumbnailUrl = `https://docs.google.com/viewer?url=${file.download_url}&embedded=true`;
+                // Create grid items for each image
+                imageFiles.forEach(image => {
+                    const imageItem = document.createElement('div');
+                    imageItem.classList.add('grid-item');
 
-                    pdfItem.innerHTML = `
-                        <a href="${file.download_url}" target="_blank">
-                            <img src="${thumbnailUrl}" alt="${file.name}">
-                            <span>${file.name}</span>
-                        </a>
+                    const imageUrl = `${thumbnailFolder}/${image}`;
+
+                    imageItem.innerHTML = `
+                        <img src="${imageUrl}" alt="${image}">
                     `;
-                    pdfGrid.appendChild(pdfItem);
+                    imageGrid.appendChild(imageItem);
                 });
             } catch (error) {
-                console.error("Error fetching PDF files:", error);
-                pdfGrid.innerHTML = `<p style="color: red;">Error loading PDFs. Please try again later.</p>`;
+                console.error("Error loading images:", error);
+                imageGrid.innerHTML = `<p style="color: red;">Error loading images. Please check your file structure.</p>`;
             }
         }
 
-        // Fetch PDFs on page load
-        fetchPDFs();
+        // Load images on page load
+        loadImages();
     </script>
 </body>
 </html>
