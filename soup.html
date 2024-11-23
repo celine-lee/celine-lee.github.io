@@ -42,45 +42,76 @@
 </head>
 <body>
     <h1>I love soup.</h1>
-    <div class="grid-container" id="imageGrid"></div>
+    <div class="grid-container" id="imageGrid">        <div class="grid-item">
+            <img src="soup/pdfs/24_06_09_21a.pdf" alt="soup/pdfs/24_06_09_21a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_28_18.pdf" alt="soup/pdfs/24_06_28_18.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_09_21b.pdf" alt="soup/pdfs/24_06_09_21b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_08_24_19b.pdf" alt="soup/pdfs/24_08_24_19b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_03_21a.pdf" alt="soup/pdfs/24_06_03_21a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_08_24_19a.pdf" alt="soup/pdfs/24_08_24_19a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_03_21b.pdf" alt="soup/pdfs/24_06_03_21b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_11_21_20a.pdf" alt="soup/pdfs/24_11_21_20a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_22b.pdf" alt="soup/pdfs/24_06_07_22b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_11_21_20c.pdf" alt="soup/pdfs/24_11_21_20c.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_11_21_20b.pdf" alt="soup/pdfs/24_11_21_20b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_22a.pdf" alt="soup/pdfs/24_06_07_22a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_21c.pdf" alt="soup/pdfs/24_06_07_21c.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_21b.pdf" alt="soup/pdfs/24_06_07_21b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_11_20_19.pdf" alt="soup/pdfs/24_11_20_19.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_02_16.pdf" alt="soup/pdfs/24_06_02_16.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_07_15_13a.pdf" alt="soup/pdfs/24_07_15_13a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_07_15_13b.pdf" alt="soup/pdfs/24_07_15_13b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_30.pdf" alt="soup/pdfs/24_06_07_30.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_14_20a.pdf" alt="soup/pdfs/24_06_14_20a.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_07_21.pdf" alt="soup/pdfs/24_06_07_21.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_14_20b.pdf" alt="soup/pdfs/24_06_14_20b.pdf">
+        </div>
+        <div class="grid-item">
+            <img src="soup/pdfs/24_06_02_12.pdf" alt="soup/pdfs/24_06_02_12.pdf">
+        </div>
+    </div>
 
-    <script>
-        const thumbnailFolder = "soup/thumbnails"; // Folder containing thumbnails
-
-        const imageGrid = document.getElementById('imageGrid');
-
-        // Fetch all images and generate grid items
-        async function loadImages() {
-            try {
-                const response = await fetch(thumbnailFolder);
-                const parser = new DOMParser();
-                const html = parser.parseFromString(await response.text(), "text/html");
-
-                // Get all image file names from the folder listing
-                const imageFiles = [...html.querySelectorAll('a')]
-                    .map(link => link.href.split('/').pop())
-                    .filter(name => name.endsWith('.png'));
-
-                // Create grid items for each image
-                imageFiles.forEach(image => {
-                    const imageItem = document.createElement('div');
-                    imageItem.classList.add('grid-item');
-
-                    const imageUrl = `${thumbnailFolder}/${image}`;
-
-                    imageItem.innerHTML = `
-                        <img src="${imageUrl}" alt="${image}">
-                    `;
-                    imageGrid.appendChild(imageItem);
-                });
-            } catch (error) {
-                console.error("Error loading images:", error);
-                imageGrid.innerHTML = `<p style="color: red;">Error loading images. Please check your file structure.</p>`;
-            }
-        }
-
-        // Load images on page load
-        loadImages();
-    </script>
 </body>
 </html>

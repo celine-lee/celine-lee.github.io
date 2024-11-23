@@ -81,3 +81,63 @@ for pdf_file in fetch_pdf_list():
                 print(f"Thumbnail generated: {local_thumbnail_path}")
         except Exception as e:
             print(f"Error processing {pdf_file}: {e}")
+
+import glob
+
+grid_item_html = """        <div class="grid-item">
+            <img src="{src}" alt="{alt}">
+        </div>"""
+
+soup_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I love soup.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .grid-item {
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #fff;
+            transition: box-shadow 0.2s;
+        }
+        .grid-item:hover {
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .grid-item img {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>I love soup.</h1>
+    <div class="grid-container" id="imageGrid">""" + "\n".join(grid_item_html.format(src=img_path, alt=img_path) for img_path in glob.glob("soup/pdfs/*.pdf")) + """
+    </div>
+
+</body>
+</html>
+"""
+
+with open("soup.html", 'w') as wf:
+    wf.write(soup_html)
