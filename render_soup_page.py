@@ -49,8 +49,8 @@ def download_pdf(pdf_url, local_path):
 os.makedirs(thumbnail_folder, exist_ok=True)
 
 # Thumbnail dimensions
-THUMBNAIL_WIDTH = 400  # Desired width for thumbnails
-THUMBNAIL_HEIGHT = 400  # Desired height for thumbnails
+THUMBNAIL_WIDTH = 800  # Desired width for thumbnails
+THUMBNAIL_HEIGHT = 800  # Desired height for thumbnails
 
 # Process each PDF in the folder
 for pdf_file in fetch_pdf_list():
