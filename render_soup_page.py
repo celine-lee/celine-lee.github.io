@@ -49,8 +49,8 @@ def download_pdf(pdf_url, local_path):
 os.makedirs(thumbnail_folder, exist_ok=True)
 
 # Thumbnail dimensions
-THUMBNAIL_WIDTH = 200  # Desired width for thumbnails
-THUMBNAIL_HEIGHT = 200  # Desired height for thumbnails
+THUMBNAIL_WIDTH = 400  # Desired width for thumbnails
+THUMBNAIL_HEIGHT = 400  # Desired height for thumbnails
 
 # Process each PDF in the folder
 for pdf_file in fetch_pdf_list():
@@ -132,7 +132,7 @@ soup_html = """<!DOCTYPE html>
 </head>
 <body>
     <h1>I love soup.</h1>
-    <div class="grid-container" id="imageGrid">""" + "\n".join(grid_item_html.format(src=img_path, alt=img_path) for img_path in glob.glob("soup/pdfs/*.pdf")) + """
+    <div class="grid-container" id="imageGrid">""" + "\n".join(grid_item_html.format(src=img_path, alt=img_path) for img_path in glob.glob("soup/thumbnails/*.png")) + """
     </div>
 
 </body>
