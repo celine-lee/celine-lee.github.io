@@ -109,8 +109,8 @@ soup_html = """<!DOCTYPE html>
         }
         .grid-item {
             text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border: 0px solid #f9f9f9;
+            border-radius: 4px;
             padding: 10px;
             background-color: #fff;
             transition: box-shadow 0.2s;
