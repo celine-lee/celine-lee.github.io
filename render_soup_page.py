@@ -135,7 +135,7 @@ soup_html = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <h1><I love <a href="https://github.com/celine-lee/soup">soup</a>.</h1>
+    <h1>I love <a href="https://github.com/celine-lee/soup">soup</a>.</h1>
     <div class="grid-container" id="imageGrid">""" + "\n".join(grid_item_html.format(src=img_path, alt=img_path) for img_path in glob.glob("soup/thumbnails/*.png")) + """
     </div>
 
