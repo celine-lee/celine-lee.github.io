@@ -99,7 +99,7 @@ soup_html = """<!DOCTYPE html>
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #ffffff;
         }
         .grid-container {
             display: grid;
@@ -109,7 +109,7 @@ soup_html = """<!DOCTYPE html>
         }
         .grid-item {
             text-align: center;
-            border: 0px solid #f9f9f9;
+            border: 0px solid #ffffff;
             border-radius: 4px;
             padding: 10px;
             background-color: #fff;
