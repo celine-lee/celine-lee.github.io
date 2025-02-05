@@ -140,6 +140,9 @@ soup_html = """<!DOCTYPE html>
     </div>
 
 </body>
+<footer>
+  <p>Method: Ask "can you draw me a soup?"<br>
+</footer>
 </html>
 """
 
