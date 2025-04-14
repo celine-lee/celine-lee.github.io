@@ -2,6 +2,7 @@ import fitz  # PyMuPDF
 from PIL import Image
 import os
 import requests
+import random
 
 # GitHub repository details
 repo_owner = "celine-lee"  # Replace with your GitHub username
@@ -26,6 +27,7 @@ def fetch_pdf_list():
     if response.status_code == 200:
         files = response.json()
         pdf_files = [file for file in files if file['name'].endswith('.pdf')]
+        random.shuffle(pdf_files)
         return pdf_files
     else:
         print(f"Error fetching repository contents: {response.status_code}")
