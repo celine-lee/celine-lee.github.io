@@ -7,6 +7,7 @@ THUMBNAIL_WIDTH = 800
 THUMBNAIL_HEIGHT = 800
 
 library_contents = [
+    ("https://celine-lee.github.io/library.html", f"{thumbnail_folder}/dopamine_deficit.jpg", "Dopamine Deficit"),
     ("creatives/sausage_curve.pdf", f"{thumbnail_folder}/sausage_curve.jpg", "Why'd they curve the bun too?"),
     ("creatives/bird saturday 2.pdf", f"{thumbnail_folder}/bird saturday 2.jpg", "Bird Saturday - Milk Stage Edition"),
     ("https://medium.com/@celine.y.lee/how-to-understand-and-to-be-understood-1bd87cb31a40", f"{thumbnail_folder}/understood.jpg", "How to be understood?"),

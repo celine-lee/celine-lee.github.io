@@ -18,7 +18,7 @@ entries = [
      "https://openreview.net/pdf?id=OdUqJwu0Gr",
      "pubs/thumbnails/sys2.jpg"),
 
-    ("The Counterfeit Conundrum",
+    ("The Counterfeit Conundrum: Can Code Language Models Grasp the Nuances of Their Incorrect Generations?",
      "Alex Gu, Celine Lee*, Wen-Ding Li*, Naman Jain*, Theo X. Olausson*, Koushik Sen, Armando Solar-Lezama",
      "ACL 2024 - Findings",
      "https://arxiv.org/abs/2402.19475",
@@ -96,7 +96,7 @@ html_output = """<html>
           </td>
         </tr>
         <tr>
-          <td>PhD student @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
+          <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
           <td>Currently (Spring 2025): Adjunct Instructor @ <a href="https://mbzuai.ac.ae/">Mohamed Bin Zayed University of Artificial Intelligence</a> in Abu Dhabi, UAE.</td>
@@ -113,7 +113,7 @@ html_output = """<html>
 """ + html_output + """
    <h2>News</h2>
     <ul>
-      <li><i>April 2025</i> - am co-organizing the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025. Submit, review, and attend!</li>
+      <li><i>April 2025</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025.</li>
       <li><i>March 2025</i> - I am honored to be recognized as an ML & Systems Rising Star!</li>
       <li><i>June 2024</i> - I was interviewed by Jennifer Sheffield for the Cognitive Computation Group Blog. <a href="https://ccgblog.seas.upenn.edu/2024/06/interview-with-celine-lee-ccg-2019-2020/">Interview link.</a></li>
       <li><i>October 2021</i> - I was interviewed by Dr. Justin Gottschlich on the Machine Programming & Technology channel. <a href="https://www.youtube.com/watch?v=1BMIbFXG2r8">Video</a></li>
