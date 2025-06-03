@@ -99,7 +99,7 @@ html_output = """<html>
           <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
-          <td>Currently (Spring 2025): Adjunct Instructor @ <a href="https://mbzuai.ac.ae/">Mohamed Bin Zayed University of Artificial Intelligence</a> in Abu Dhabi, UAE.</td>
+          <td>Currently (Summer 2025): Student Researcher @ Google Deepmind</td>
         </tr>
         <tr>
           <td>Previously: BSE & MSE @ University of Pennsylvania, 2020, where I worked with <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a> and <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>.</td>
