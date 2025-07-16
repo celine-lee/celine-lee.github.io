@@ -7,6 +7,7 @@ THUMBNAIL_WIDTH = 800
 THUMBNAIL_HEIGHT = 800
 
 library_contents = [
+    ("https://colab.research.google.com/drive/1h_r66PzD5XxZ2_L3pbu8p8o1LDXZ1Di5?usp=sharing", f"{thumbnail_folder}/bpe_hangman.jpg", "BPE Hangman"),
     ("creatives/banana_store.pdf", f"{thumbnail_folder}/banana_store.jpg", "The Banana Store"),
     ("https://celine-lee.github.io/library.html", f"{thumbnail_folder}/dopamine_deficit.jpg", "Dopamine Deficit"),
     ("creatives/sausage_curve.pdf", f"{thumbnail_folder}/sausage_curve.jpg", "Why'd they curve the bun too?"),
