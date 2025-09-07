@@ -7,6 +7,7 @@ THUMBNAIL_WIDTH = 800
 THUMBNAIL_HEIGHT = 800
 
 library_contents = [
+    ("https://medium.com/@celine.y.lee/lists-are-a-convenient-b-expressive-and-c-beloved-909eca72101b", f"{thumbnail_folder}/lists.jpg", "Lists"),
     ("https://medium.com/@celine.y.lee/bpe-hangman-ee8e72ff3987", f"{thumbnail_folder}/bpe_hangman.jpg", "BPE Hangman"),
     ("creatives/banana_store.pdf", f"{thumbnail_folder}/banana_store.jpg", "The Banana Store"),
     ("https://celine-lee.github.io/library.html", f"{thumbnail_folder}/dopamine_deficit.jpg", "Dopamine Deficit"),
