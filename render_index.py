@@ -113,8 +113,10 @@ html_output = """<html>
 """ + html_output + """
    <h2>News</h2>
     <ul>
+      <li><i>October 2025</i> - I will be delivering an invited talk at the <a href="https://www.lmvisionscolm.com/">Visions Workshop</a> @ COLM 2025.</li>
       <li><i>April 2025</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025.</li>
-      <li><i>March 2025</i> - I am honored to be recognized as an ML & Systems Rising Star!</li>
+      <li><i>March 2025</i> - I am honored to be recognized as an <a href="https://mlcommons.org/2025/06/2025-mlc-rising-stars/">ML & Systems Rising Star</a>!</li>
+      <li><i>January 2025</i> - I will be an Adjunct Instructor at <a href="https://mbzuai.ac.ae/">MBZUAI</a> for the semester!</li>
       <li><i>June 2024</i> - I was interviewed by Jennifer Sheffield for the Cognitive Computation Group Blog. <a href="https://ccgblog.seas.upenn.edu/2024/06/interview-with-celine-lee-ccg-2019-2020/">Interview link.</a></li>
       <li><i>October 2021</i> - I was interviewed by Dr. Justin Gottschlich on the Machine Programming & Technology channel. <a href="https://www.youtube.com/watch?v=1BMIbFXG2r8">Video</a></li>
     </ul>
