@@ -2,7 +2,7 @@
 entries = [
     ("Critical Thinking: Which Kinds of Complexity Govern Optimal Reasoning Length?",
      "Celine Lee, Alexander M. Rush, Keyon Vafa",
-     "Under submission",
+     "ACL - Findings; IJCNLP-AACL 2025",
      "https://arxiv.org/abs/2504.01935",
      "pubs/thumbnails/complexity.jpg"),
 
@@ -105,7 +105,7 @@ html_output = """<html>
           <td>Previously: BSE & MSE @ University of Pennsylvania, 2020, where I worked with <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a> and <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>.</td>
         </tr>
         <tr>
-          <td>My <a href="CV.pdf">CV</a> and my <a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
+          <td>My (likely outdated) <a href="CV.pdf">CV</a> and my <a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
         </tr>
       </tbody>
     </table>
@@ -113,7 +113,7 @@ html_output = """<html>
 """ + html_output + """
    <h2>News</h2>
     <ul>
-      <li><i>October 2025</i> - I will be delivering an invited talk at the <a href="https://www.lmvisionscolm.com/">Visions Workshop</a> @ COLM 2025.</li>
+      <li><i>October 2025</i> - I gave an invited talk at the <a href="https://www.lmvisionscolm.com/">Visions Workshop</a> @ COLM 2025.</li>
       <li><i>April 2025</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025.</li>
       <li><i>March 2025</i> - I am honored to be recognized as an <a href="https://mlcommons.org/2025/06/2025-mlc-rising-stars/">ML & Systems Rising Star</a>!</li>
       <li><i>January 2025</i> - I will be an Adjunct Instructor at <a href="https://mbzuai.ac.ae/">MBZUAI</a> for the semester!</li>
