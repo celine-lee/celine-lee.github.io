@@ -102,7 +102,7 @@ html_output = """<html>
           <td>Currently (Summer 2025): Student Researcher @ Google Deepmind</td>
         </tr>
         <tr>
-          <td>Previously: BSE & MSE @ University of Pennsylvania, 2020, where I worked with <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a> and <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>.</td>
+          <td>I have worked with fantastic teams at IBM TJ Watson (mentored by <a href="https://ramon-astudillo.github.io/">Ramón Fernandez Astudillo</a>), Intel Labs (mentored by <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>), and the University of Pennsylvania (mentored by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
         </tr>
         <tr>
           <td>My (likely outdated) <a href="CV.pdf">CV</a> and my <a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
