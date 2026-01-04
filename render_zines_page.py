@@ -7,6 +7,7 @@ THUMBNAIL_WIDTH = 800
 THUMBNAIL_HEIGHT = 800
 
 library_contents = [
+    ("creatives/bookmarks.pdf", f"{thumbnail_folder}/bookmarks.png", "Bad Bookmarks"),
     ("https://docs.google.com/document/d/1XceAsjU8cc83T1Q8dFUZCdVIwoJgK33F2LMtdjDjHg8/edit?usp=sharing", f"{thumbnail_folder}/club_penguin.png", "A Club Penguin Screenplay"),
     ("https://medium.com/@celine.y.lee/distances-of-communication-d422a5d83eec", f"{thumbnail_folder}/distances_of_communication.jpg", "Distances of Communication"),
     ("https://medium.com/@celine.y.lee/lists-are-a-convenient-b-expressive-and-c-beloved-909eca72101b", f"{thumbnail_folder}/lists.jpg", "Lists"),
