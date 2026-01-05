@@ -4,7 +4,8 @@ entries = [
      "Celine Lee, Alexander M. Rush, Keyon Vafa",
      "ACL - Findings; IJCNLP-AACL 2025",
      "https://arxiv.org/abs/2504.01935",
-     "pubs/thumbnails/complexity.jpg"),
+     "pubs/thumbnails/complexity.jpg",
+     "https://www.youtube.com/watch?v=CxXONtekV3M"),
 
     ("Commit0: Library Generation from Scratch",
      "Wenting Zhao, Nan Jiang, Celine Lee, Justin T. Chiu, Claire Cardie, Matthias Gallé, Alexander M. Rush",
@@ -68,12 +69,28 @@ pub_item_template = '''
   </div>
 </div>
 '''
+pub_item_w_vid_template = '''
+<div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
+  <img src="{img}" alt="pub thumbnail" width="60" height="60" style="margin-right: 15px; border-radius: 5px;">
+  <div>
+    <b>{title}</b><br>
+    <i>{authors}</i><br>
+    {venue}<br>
+    <a href="{url}" target="_blank">Link</a>. <a href="{video}" target="_blank">Video</a>. 
+  </div>
+</div>
+'''
 
 html_output = '<h2>Publications</h2>\n'
-for title, authors, venue, url, img in entries:
-    authors_bolded = authors.replace("Celine Lee", "<b>Celine Lee</b>")
-    html_output += pub_item_template.format(title=title, authors=authors_bolded, venue=venue, url=url, img=img)
-
+for data in entries:
+    if len(data) == 5:
+      title, authors, venue, url, img = data
+      authors_bolded = authors.replace("Celine Lee", "<b>Celine Lee</b>")
+      html_output += pub_item_template.format(title=title, authors=authors_bolded, venue=venue, url=url, img=img)
+    elif len(data) == 6:
+      title, authors, venue, url, img, video = data
+      authors_bolded = authors.replace("Celine Lee", "<b>Celine Lee</b>")
+      html_output += pub_item_w_vid_template.format(title=title, authors=authors_bolded, venue=venue, url=url, img=img, video=video)
 html_output += '<h2>Patents</h2>\n<ul>'
 for patent in patents:
     html_output += f'<li>{patent}</li>'
@@ -99,7 +116,7 @@ html_output = """<html>
           <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
-          <td>Currently (Summer 2025): Student Researcher @ Google Deepmind</td>
+          <td>Currently: Student Researcher @ Google Deepmind</td>
         </tr>
         <tr>
           <td>I have worked with fantastic teams at IBM TJ Watson (mentored by <a href="https://ramon-astudillo.github.io/">Ramón Fernandez Astudillo</a>), Intel Labs (mentored by <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>), and the University of Pennsylvania (mentored by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
