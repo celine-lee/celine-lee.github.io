@@ -3,7 +3,7 @@ entries = [
     ("Critical Thinking: Which Kinds of Complexity Govern Optimal Reasoning Length?",
      "Celine Lee, Alexander M. Rush, Keyon Vafa",
      "ACL - Findings; IJCNLP-AACL 2025",
-     "https://arxiv.org/abs/2504.01935",
+     "https://aclanthology.org/2025.ijcnlp-long.57/#",
      "pubs/thumbnails/complexity.jpg",
      "https://www.youtube.com/watch?v=CxXONtekV3M"),
 
@@ -16,7 +16,7 @@ entries = [
     ("Sampling Language from Latent System-2 Reasoning",
      "Celine Lee, Arafat Sultan, Tahira Naseem, Alexander M. Rush, Ramon Fernandez Astudillo",
      "NeurIPS 2024 - System 2 Reasoning at Scale",
-     "https://openreview.net/pdf?id=OdUqJwu0Gr",
+     "https://openreview.net/forum?id=OdUqJwu0Gr",
      "pubs/thumbnails/sys2.jpg"),
 
     ("The Counterfeit Conundrum: Can Code Language Models Grasp the Nuances of Their Incorrect Generations?",
@@ -116,10 +116,10 @@ html_output = """<html>
           <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
-          <td>Currently: Student Researcher @ Google Deepmind</td>
+          <td>Currently: AI Research Intern @ Figma</td>
         </tr>
         <tr>
-          <td>I have worked with fantastic teams at IBM TJ Watson (mentored by <a href="https://ramon-astudillo.github.io/">Ramón Fernandez Astudillo</a>), Intel Labs (mentored by <a href="https://sites.google.com/view/gottschlich">Justin Gottschlich</a>), and the University of Pennsylvania (mentored by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
+          <td>I have worked with fantastic teams at Google Deepmind, IBM TJ Watson, Intel Labs, and the University of Pennsylvania (advised by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
         </tr>
         <tr>
           <td>My (likely outdated) <a href="CV.pdf">CV</a> and my <a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
