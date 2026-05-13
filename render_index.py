@@ -1,5 +1,11 @@
 # Data for papers and patents
 entries = [
+    ("The Efficiency Gap in Byte Modeling",
+     "Celine Lee, Jing Nathan Yan, Chen Liang, Jiaxin Shi, Yin Zhang, Jeremiah Liu, Pengcheng Yin, Fernando Pereira, Ed Chi, Derek Cheng, Alexander M. Rush, Ruoxi Wang",
+     "ICML 2026; ICLR 2026 - MMIntelligence Workshop (Oral)",
+     "",
+     "pubs/thumbnails/byte_modeling.png"),
+
     ("Critical Thinking: Which Kinds of Complexity Govern Optimal Reasoning Length?",
      "Celine Lee, Alexander M. Rush, Keyon Vafa",
      "ACL - Findings; IJCNLP-AACL 2025",
