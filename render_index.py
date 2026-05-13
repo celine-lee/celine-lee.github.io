@@ -122,13 +122,10 @@ html_output = """<html>
           <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
-          <td>Currently: AI Research Intern @ Figma</td>
+          <td>I have worked with fantastic teams at Google Deepmind, Figma AI, IBM TJ Watson, Intel Labs, and the University of Pennsylvania (advised by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
         </tr>
         <tr>
-          <td>I have worked with fantastic teams at Google Deepmind, IBM TJ Watson, Intel Labs, and the University of Pennsylvania (advised by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
-        </tr>
-        <tr>
-          <td>My (likely outdated) <a href="CV.pdf">CV</a> and my <a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
+          <td><a href="https://scholar.google.com/citations?user=F27S1VcAAAAJ&hl=en">Google Scholar</a>.</td>
         </tr>
       </tbody>
     </table>
