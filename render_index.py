@@ -133,6 +133,7 @@ html_output = """<html>
 """ + html_output + """
    <h2>News</h2>
     <ul>
+      <li><i>April 2026</i> - I co-organized <a href="https://verifai-workshop.github.io/">VerifAI 2</a> workshop @ ICLR 2026.</li>
       <li><i>October 2025</i> - I gave an invited talk at the <a href="https://www.lmvisionscolm.com/">Visions Workshop</a> @ COLM 2025.</li>
       <li><i>April 2025</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025.</li>
       <li><i>March 2025</i> - I am honored to be recognized as an <a href="https://mlcommons.org/2025/06/2025-mlc-rising-stars/">ML & Systems Rising Star</a>!</li>
@@ -141,14 +142,8 @@ html_output = """<html>
       <li><i>October 2021</i> - I was interviewed by Dr. Justin Gottschlich on the Machine Programming & Technology channel. <a href="https://www.youtube.com/watch?v=1BMIbFXG2r8">Video</a></li>
     </ul>
     
-    <h2>Software</h2>
-    <ul>
-      <li>Semantic Role Labeling <a href="https://cogcomp.seas.upenn.edu/page/demo_view/SRLEnglish">(English)</a> <a href="https://cogcomp.seas.upenn.edu/page/demo_view/SRLSpanish">(Spanish)</a></li>
-    </ul>
-
     <h2>Misc.</h2>
       <ul><a href="library.html">Libary of writings, zines, some arts and crafts.</a></ul>
-      <ul>Slides from past presentations <a href="https://drive.google.com/drive/folders/1AUmpPifg2lq_C-YDBizPyFxFYDsJBVgf?usp=share_link">here</a>.</ul>
       <ul>A running <a href="party.html">list of what-to-do ideas when you need some inspiration</a>. Use them if that's fun for you</ul>
       <ul>I like <a href="soup.html">soup a lot</a>.</ul>
   </body>
