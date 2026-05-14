@@ -3,7 +3,7 @@ entries = [
     ("The Efficiency Gap in Byte Modeling",
      "Celine Lee, Jing Nathan Yan, Chen Liang, Jiaxin Shi, Yin Zhang, Jeremiah Liu, Pengcheng Yin, Fernando Pereira, Ed Chi, Derek Cheng, Alexander M. Rush, Ruoxi Wang",
      "ICML 2026; ICLR 2026 - MMIntelligence Workshop (Oral)",
-     "",
+     "https://arxiv.org/abs/2605.12928",
      "pubs/thumbnails/byte_modeling.png"),
 
     ("Critical Thinking: Which Kinds of Complexity Govern Optimal Reasoning Length?",
