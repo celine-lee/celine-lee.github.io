@@ -119,7 +119,7 @@ html_output = """<html>
           </td>
         </tr>
         <tr>
-          <td>PhD candidate @ Cornell University, advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
+          <td>I recently earned my PhD from Cornell University, where I was advised by <a href="http://rush-nlp.com">Sasha Rush</a>. I work on language modeling, with a special focus on code reasoning and generation.</td>
         </tr>
         <tr>
           <td>I have worked with fantastic teams at Google Deepmind, Figma AI, IBM TJ Watson, Intel Labs, and the University of Pennsylvania (advised by <a href="https://www.cis.upenn.edu/~danroth/">Dan Roth</a>). I devote energy to teaching and education; in Spring 2025, I was an Adjunct Instructor at the Mohamed Bin Zayed University of AI, and in Summer 2023 taught the Cornell's Break Through Tech Program. </td>
@@ -133,7 +133,8 @@ html_output = """<html>
 """ + html_output + """
    <h2>News</h2>
     <ul>
-      <li><i>April 2026</i> - I co-organized <a href="https://verifai-workshop.github.io/">VerifAI 2</a> workshop @ ICLR 2026.</li>
+      <li><i>May 2026</i> - I graduated with my PhD! I had the honor of speaking at the Cornell Tech graduation.</li>
+      <li><i>April 2026</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI 2</a> workshop @ ICLR 2026.</li>
       <li><i>October 2025</i> - I gave an invited talk at the <a href="https://www.lmvisionscolm.com/">Visions Workshop</a> @ COLM 2025.</li>
       <li><i>April 2025</i> - I co-organized the <a href="https://verifai-workshop.github.io/">VerifAI: AI Verification in the Wild</a> workshop @ ICLR 2025.</li>
       <li><i>March 2025</i> - I am honored to be recognized as an <a href="https://mlcommons.org/2025/06/2025-mlc-rising-stars/">ML & Systems Rising Star</a>!</li>
