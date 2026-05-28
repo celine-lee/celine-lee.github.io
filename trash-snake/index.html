@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trash Snake — Manhattan</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script type="module" crossorigin src="/trash-snake/assets/index-D5yyD4T0.js"></script>
+    <link rel="stylesheet" crossorigin href="/trash-snake/assets/index-BEfHRqEC.css">
+  </head>
+  <body>
+    <div id="app">
+      <aside id="sidebar">
+        <section class="location-panel">
+          <h2>Location</h2>
+          <p id="location" class="location-line">—</p>
+        </section>
+        <section class="stats">
+          <div><span>Collections</span><strong id="collections">0</strong></div>
+          <div><span>Survived</span><strong id="survival">0</strong></div>
+        </section>
+        <section class="pickup-panel">
+          <h2>Pickups</h2>
+          <ul id="pickup-log" class="pickup-log"></ul>
+        </section>
+        <section class="direction-panel" aria-label="Movement direction">
+          <h2>Direction</h2>
+          <div class="dir-box">
+            <span class="dir-box-label">Current</span>
+            <strong id="dir-current" class="dir-box-value">—</strong>
+          </div>
+          <div class="dir-box">
+            <span class="dir-box-label">Queued</span>
+            <strong id="dir-queued" class="dir-box-value">—</strong>
+          </div>
+        </section>
+        <p class="hint controls-hint">
+          <strong>Controls:</strong> arrow keys for direction. Hit your tail or a corner of the map and you're out.
+        </p>
+        <p id="status" class="status">Loading map…</p>
+        <button id="start" type="button" class="primary-btn">Play</button>
+        <button id="restart" type="button" class="primary-btn" hidden>Play again</button>
+      </aside>
+
+      <main id="map-wrap">
+        <div id="leaflet-map"></div>
+        <canvas id="game-canvas"></canvas>
+        <div id="overlay" class="overlay hidden">
+          <h2 id="overlay-title"></h2>
+          <p id="overlay-msg"></p>
+          <button id="overlay-start" type="button" class="primary-btn overlay-btn">Play</button>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

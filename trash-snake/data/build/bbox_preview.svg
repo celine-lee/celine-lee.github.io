@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="520">
+  <rect width="100%" height="100%" fill="#1a2332"/>
+  <rect x="40" y="40" width="640" height="440" fill="none" stroke="#3ecf8e" stroke-width="3" stroke-dasharray="8 6"/>
+  <text x="360" y="28" fill="#e8eef7" font-family="system-ui" font-size="14" text-anchor="middle">Trash Snake — bbox preview (not to scale)</text>
+  <text x="360" y="470" fill="#8b9cb3" font-family="monospace" font-size="12" text-anchor="middle">S 40.728  W -74.005  N 40.768  E -73.965</text>
+  <text x="360" y="492" fill="#8b9cb3" font-family="system-ui" font-size="11" text-anchor="middle">Open staticmap in browser or re-run when online for PNG</text>
+</svg>

@@ -1,0 +1,26 @@
+{
+  "label": "core Manhattan (Chelsea\u2013Midtown)",
+  "bbox": {
+    "south": 40.728,
+    "west": -74.005,
+    "north": 40.768,
+    "east": -73.965
+  },
+  "center": {
+    "lat": 40.748000000000005,
+    "lon": -73.985
+  },
+  "sizeKm": {
+    "width": 3.37,
+    "height": 4.45
+  },
+  "graphRadiusM": 900,
+  "placeNames": {
+    "SW": "King Street, Hudson Square, Manhattan, New York County, New York, 10014, United States",
+    "SE": "Greenpoint, Brooklyn, Kings County, New York, 11222, United States",
+    "NW": "Lincoln Tunnel, Hudson Yards, Manhattan Community Board 4, Manhattan, New York County, New York, 10199, United States",
+    "NE": "East 68th Street, Lenox Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10065, United States",
+    "center": "5th Avenue, Koreatown, Manhattan Community Board 5, Manhattan, New York County, New York, 10118, United States"
+  },
+  "previewImage": "build/bbox_preview.png"
+}
