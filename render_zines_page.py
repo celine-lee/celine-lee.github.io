@@ -7,6 +7,8 @@ THUMBNAIL_WIDTH = 800
 THUMBNAIL_HEIGHT = 800
 
 library_contents = [
+    ("https://medium.com/@celine.y.lee/trash-snake-752a69220d02", f"{thumbnail_folder}/trash-snake.png", "Trash Snake"),
+    ("https://medium.com/@celine.y.lee/my-cornell-tech-2026-commencement-speech-d5635e13f77b", f"{thumbnail_folder}/grad_speech.JPG", "My Cornell Commencement Speech"),
     ("creatives/bookmarks.pdf", f"{thumbnail_folder}/bookmarks.png", "Bad Bookmarks"),
     ("https://docs.google.com/document/d/1XceAsjU8cc83T1Q8dFUZCdVIwoJgK33F2LMtdjDjHg8/edit?usp=sharing", f"{thumbnail_folder}/club_penguin.png", "A Club Penguin Screenplay"),
     ("https://medium.com/@celine.y.lee/distances-of-communication-d422a5d83eec", f"{thumbnail_folder}/distances_of_communication.jpg", "Distances of Communication"),
