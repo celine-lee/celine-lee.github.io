@@ -1,0 +1,1643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mii Studio — Mii Channel</title>
+<style>
+:root{
+  --ink:#33383c;
+  --rail-a:#b9c2c2; --rail-b:#96a1a1;      /* grey tab trough */
+  --btn-a:#ffffff;  --btn-b:#dde2e2;        /* white plastic buttons */
+  --btn-line:#7f8c8c;
+  --accent:#d97a45; --accent-lt:#eda072; --accent-d:#a9521c;
+  --tray:#c6d3d8; --tray-b:#b3c3c9; --tray-line:#8fa0a6;
+  --tile-line:#94a3a8;
+  --r:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:#ccd4d4;
+  color:var(--ink);
+  font-family:"Avenir Next",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:1180px;margin:0 auto;padding:16px 16px 40px}
+
+/* ---------- tab rail, sitting on the content board ---------- */
+.board{
+  border-radius:var(--r);overflow:hidden;
+  background:#eef3f4;                       /* open space the Mii stands in */
+  border:1px solid #a1adae;
+  box-shadow:0 7px 20px rgba(28,44,50,.17);
+}
+.railwrap{background:var(--rail-a);padding:0 6px;border-bottom:1px solid #97a4a4}
+.tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:1 1 0;min-width:64px;height:56px;
+  border-radius:0 0 10px 10px;
+  display:grid;place-items:center;color:#48545a;
+  background:#e4eaea;
+  border:1px solid #a4afaf;border-top:none;
+  transition:background .12s, color .12s;
+}
+.tab svg{width:32px;height:32px;stroke-width:1.8}
+.tab:hover{background:#f1f5f5;color:#2f383c}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent-d)}
+
+/* ---------- layout ---------- */
+main{display:grid;grid-template-columns:minmax(268px,330px) 1fr;gap:10px;padding:10px;align-items:start}
+@media (max-width:880px){main{grid-template-columns:1fr}}
+
+/* ---------- preview ---------- */
+.stage{
+  padding:0;position:sticky;top:16px;background:none;border:0;
+}
+.stage-art{
+  background:none;border:0;overflow:visible;
+}
+#mii{display:block;width:100%;height:clamp(300px,48vh,436px)}
+.stage-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.stage-bar .iconbtn{flex:none}
+input.name{
+  flex:1;min-width:0;padding:9px 13px;border:1px solid var(--btn-line);border-radius:9px;
+  background:#fff;font-size:13px;
+}
+input.name:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(217,122,69,.3)}
+.iconbtn{
+  width:46px;height:44px;flex:none;border-radius:10px;display:grid;place-items:center;color:#3b4145;
+  background:#f2f5f5;border:1px solid #a4afaf;
+  transition:background .12s;
+}
+.iconbtn svg{width:25px;height:25px}
+.iconbtn:hover{background:#fff}
+.iconbtn:active{background:#e2e8e8}
+.iconbtn.go{
+  color:#fff;border-color:var(--accent-d);background:var(--accent);
+}
+
+/* ---------- options tray ---------- */
+.panel{
+  border-radius:var(--r);overflow:hidden;min-height:484px;
+  background:var(--tray);border:1px solid #9aabb1;
+  box-shadow:0 5px 14px rgba(28,44,50,.15);
+}
+.tray{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;padding:10px}
+.tray--full{grid-template-columns:1fr}
+.side-stack{display:grid;gap:11px;align-content:start}
+@media (max-width:900px){.tray{grid-template-columns:1fr}}
+.tray-main{min-width:0;display:grid;gap:9px}
+.tray-side{min-width:0}
+
+/* sub-category switch, as on the Wii */
+.subs{display:flex;gap:6px}
+.sub{
+  flex:1;height:48px;border-radius:10px;display:grid;place-items:center;color:#3b4145;
+  background:#f2f5f5;border:1px solid #a4afaf;transition:background .12s;
+}
+.sub svg{width:27px;height:27px}
+.sub:hover{background:#fff}
+.sub.on{color:#fff;border-color:var(--accent-d);background:var(--accent)}
+
+.box{
+  background:#e9eeee;border:1px solid #adb8b9;border-radius:10px;padding:8px;
+}
+.pager{display:flex;align-items:center;gap:4px}
+.pager .grid{flex:none;grid-template-columns:repeat(2,104px);gap:7px}
+.pg{
+  flex:none;width:32px;padding:0;display:grid;place-items:center;
+  background:none;border:0;box-shadow:none;color:var(--accent);
+  transition:color .12s, transform .1s;
+}
+.pg svg{width:28px;height:28px}
+.pg:hover{color:var(--accent-d);transform:scale(1.12)}
+.pg:active{transform:scale(.96)}
+.dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+.dot{width:9px;height:9px;border-radius:50%;background:#fff;border:1px solid #adb8b9}
+.dot.on{background:var(--accent);border-color:var(--accent-d)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,96px));gap:8px}
+.tile{
+  position:relative;aspect-ratio:1;padding:0;border-radius:9px;overflow:hidden;
+  background:#fff;border:1px solid #adb8b9;
+  display:grid;place-items:center;transition:border-color .12s, background .12s;
+}
+.tile svg{width:100%;height:100%;display:block}
+.tile:hover{border-color:var(--accent)}
+.tile.on{border-color:var(--accent-d);background:var(--accent)}
+
+.sw-box{background:#fff;border:1px solid #adb8b9;border-radius:8px;padding:5px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,40px);gap:5px;justify-content:start}
+.sw{
+  aspect-ratio:1;border-radius:6px;border:1px solid rgba(0,0,0,.3);padding:0;
+  transition:transform .1s;
+}
+.sw.wheel{
+  position:relative;overflow:hidden;cursor:pointer;
+  background:conic-gradient(#e5484d,#e2a336,#e5d94d,#5ec26a,#3aa7c9,#5b6ad4,#a457d6,#e5484d);
+}
+.sw.wheel input{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);
+  opacity:0;border:0;padding:0;cursor:pointer}
+.sw:hover{transform:scale(1.25)}
+.sw.on{box-shadow:0 0 0 1px #fff, 0 0 0 2.5px var(--accent)}
+
+/* ---------- icon-capped sliders ---------- */
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px 10px}
+.sliders.big{grid-template-columns:1fr;gap:18px}
+.sliders.big .slider{padding:22px 20px;gap:18px;border-radius:14px}
+.sliders.big .cap{width:40px;height:40px;opacity:1;color:#42504f}
+.sliders.big input[type=range]{height:24px;border-radius:12px}
+.sliders.big input[type=range]::-webkit-slider-thumb{width:24px;height:48px;border-radius:9px}
+.sliders.big input[type=range]::-moz-range-thumb{width:22px;height:46px;border-radius:9px}
+.slider{
+  display:flex;align-items:center;gap:12px;padding:14px 13px;border-radius:11px;
+  background:#e9eeee;border:1px solid #adb8b9;
+}
+.slider .cap{flex:none;width:26px;height:26px;display:grid;place-items:center;color:#4d5a5e;opacity:.9}
+.slider .cap svg{width:100%;height:100%}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;flex:1;min-width:0;height:17px;border-radius:9px;
+  background:linear-gradient(90deg, rgba(217,122,69,.38) var(--p,50%), #fff var(--p,50%));
+  border:1px solid #adb8b9;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:17px;height:34px;border-radius:7px;cursor:grab;
+  background:var(--accent);border:1px solid var(--accent-d);transition:transform .1s;
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scaleY(1.06)}
+input[type=range]::-moz-range-thumb{
+  width:15px;height:32px;border-radius:7px;cursor:grab;
+  background:var(--accent);border:1px solid var(--accent-d);
+}
+
+/* ---------- Mii info page ---------- */
+.profile{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;align-items:start}
+.pf{
+  border-radius:14px;padding:11px 13px 13px;
+  background:#e8e6e1;border:1px solid #bab4ab;
+}
+.pf .lab{
+  display:block;text-align:center;margin-bottom:8px;
+  font-size:15px;font-weight:800;letter-spacing:.015em;color:#8b8379;
+  text-shadow:0 1px 0 rgba(255,255,255,.95);
+}
+.s1{grid-column:span 1}.s2{grid-column:span 2}.s3{grid-column:span 3}
+.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}
+.pf--fill{align-self:stretch;display:flex;flex-direction:column}
+.pf--fill .field{flex:1}
+.pf--fill .fav-btn{flex:none}
+@media (max-width:620px){.s1,.s2,.s3,.s4,.s5{grid-column:span 6}}
+.field{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:44px;padding:9px 14px;border-radius:11px;
+  font-size:18px;font-weight:700;color:#495450;text-align:center;
+  background:#f4f2ee;border:1px solid #b6b0a7;
+}
+input.field, select.field{-webkit-appearance:none;appearance:none;text-align:center;text-align-last:center}
+input.field:focus, select.field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(217,122,69,.3)}
+button.field{cursor:pointer;transition:filter .12s}
+button.field:hover{background:#fbfaf8}
+button.field:active{background:#e8e5e0}
+.fav-btn{width:46px;height:46px;min-height:46px;padding:0;margin:0 auto;color:#c99a12;flex:none}
+.fav-btn .star{display:grid;place-items:center;width:27px;height:27px;opacity:0;transition:opacity .12s}
+.fav-btn.on .star{opacity:1}
+.fav-btn svg{width:27px;height:27px}
+.fav-btn.on{background:#f7e9b4;border-color:#c9b45f;color:#b8890c}
+.bday{display:flex;align-items:center;gap:6px}
+.bday .field{padding:7px 6px}
+.bday .slash{font-weight:800;font-size:18px;color:#9a938a;flex:none}
+.favgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:270px;margin:0 auto}
+.fav{
+  aspect-ratio:1;border-radius:5px;border:1px solid rgba(0,0,0,.3);padding:0;cursor:pointer;
+  transition:transform .1s;
+}
+.fav:hover{transform:scale(1.12)}
+.fav.on{box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--accent)}
+
+/* ---------- icon toggles ---------- */
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.toggle{
+  width:54px;height:46px;border-radius:10px;display:grid;place-items:center;color:#3b4145;
+  background:#f2f5f5;border:1px solid #a4afaf;transition:background .12s;
+}
+.toggle svg{width:26px;height:26px}
+.toggle:hover{background:#fff}
+.toggle.on{color:#fff;border-color:var(--accent-d);background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="board">
+    <div class="railwrap"><nav class="tabs" id="tabs"></nav></div>
+    <main>
+    <section class="stage">
+      <div class="stage-art">
+        <svg id="mii" viewBox="104 74 304 348" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="stage-bar">
+        <button class="iconbtn" id="btnRandom" title="Surprise me" aria-label="Surprise me"></button>
+        <button class="iconbtn" id="btnReset" title="Reset" aria-label="Reset"></button>
+        <button class="iconbtn go" id="btnSave" title="Save PNG" aria-label="Save PNG"></button>
+      </div>
+    </section>
+    <section class="panel" id="panel"></section>
+    </main>
+  </div>
+</div>
+<script>
+/* ============================================================
+   MII STUDIO  —  everything is SVG, everything is parametric
+   ============================================================ */
+
+const CX = 256;              // horizontal centre of the head
+let LINE = '#3a3129';        // universal outline colour (swapped for mono tiles)
+const INK_BASE = '#3a3129';
+
+/* ---------------- palettes ---------------- */
+const SKINS = ['#ffcfd6','#ffe2c8','#f8caa4','#edad7c','#dd9159','#c47540','#a45c2d','#7f451f','#582d13'];
+const HAIRC = ['#241d17','#3d2a1c','#5b3a22','#7a4a24','#9c6b3d',
+               '#c08b4a','#dcae5f','#eed08a','#e6e8ea'];
+const EYEC  = ['#2c2a28','#5b3a22','#8a6a34','#3f7a4a','#2f6ea8','#6a6f75'];
+const MOUTHC= ['#c9553f','#d96a5a','#e07d7d','#b8404a','#8e3550','#d4788e','#a94c6b','#6d3a3a'];
+const SHIRTC= ['#d0243c','#ff6600','#ffd400','#a4d820','#009a3d','#00a0e9',
+               '#003cb4','#ff87b0','#7a26a0','#8c5a2b','#f2f4f6','#333a3f'];
+const GLASSC= ['#2c2a28','#5b3a22','#8a6a34','#2f6ea8','#a83030','#b0b6bc','#d4a017','#c46aa0'];
+const PANTSC= ['#3f5f92','#26304a','#2b3138','#5d6873','#8f7f61','#6b4a2f','#4a5c3a','#c9cdd2','#8c3a3a','#5a3d6b'];
+const SHOEC = ['#f2f4f6','#2b3138','#c0392b','#2f6ea8','#6b4423','#8c959e','#2e7d5b','#d0699a'];
+const FAV_PANTS = '#c25a24';   // the rust orange worn in the reference photo
+const HATC  = ['#d0243c','#ff6600','#ffd400','#2e7d5b','#00a0e9','#2f4f8f',
+               '#7a26a0','#d0699a','#8c5a2b','#f2f4f6','#8c959e','#2b3138'];   // the rust orange worn in the reference photo
+
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+/* Colour slots hold either a palette index or a literal hex from the wheel. */
+const pick = (list, v) => typeof v === 'string' ? v : list[clamp(Math.round(+v)||0, 0, list.length-1)];
+
+/* ============================================================
+   FACE — generated from parameters so every shape stays smooth
+   ============================================================ */
+const FACES = [
+  {n:'Oval',    tY:120, tW:88,  cW:106, cY:236, jW:92,  jY:318, chW:34, chY:388},
+  {n:'Round',   tY:118, tW:98,  cW:113, cY:246, jW:105, jY:322, chW:50, chY:384},
+  {n:'Square',  tY:122, tW:95,  cW:108, cY:228, jW:105, jY:338, chW:68, chY:382},
+  {n:'Pointed', tY:120, tW:88,  cW:104, cY:228, jW:82,  jY:312, chW:16, chY:394},
+  {n:'Broad',   tY:126, tW:92,  cW:113, cY:252, jW:109, jY:330, chW:54, chY:380},
+  {n:'Narrow',  tY:118, tW:78,  cW:94,  cY:238, jW:80,  jY:318, chW:30, chY:390},
+  {n:'Heart',   tY:118, tW:99,  cW:111, cY:222, jW:80,  jY:314, chW:22, chY:390},
+  {n:'Long',    tY:110, tW:84,  cW:100, cY:242, jW:88,  jY:340, chW:38, chY:408},
+  {n:'Bread',   tY:120, tW:97,  cW:111, cY:250, jW:103, jY:332, chW:58, chY:386},
+  {n:'Diamond', tY:126, tW:74,  cW:113, cY:250, jW:84,  jY:322, chW:24, chY:390},
+  {n:'Chubby',  tY:124, tW:100, cW:117, cY:256, jW:112, jY:328, chW:62, chY:378},
+  {n:'Chiseled',tY:118, tW:90,  cW:105, cY:232, jW:99,  jY:334, chW:44, chY:392}
+];
+
+function faceGeom(m){
+  const f = FACES[m.face.shape];
+  const w = m.face.width, j = m.face.jaw;
+  return {
+    tY:f.tY, tW:f.tW*w, cW:f.cW*w, cY:f.cY,
+    jW:f.jW*w*j, jY:f.jY, chW:f.chW*w*j, chY:f.chY
+  };
+}
+function facePath(g){
+  const L=w=>CX-w, R=w=>CX+w;
+  const a=(g.cY-g.tY), b=(g.jY-g.cY), c=(g.chY-g.jY);
+  return [
+    `M ${CX} ${g.tY}`,
+    `C ${L(g.tW)} ${g.tY}, ${L(g.cW)} ${g.tY+a*0.34}, ${L(g.cW)} ${g.cY}`,
+    `C ${L(g.cW)} ${g.cY+b*0.44}, ${L(g.jW)} ${g.jY-b*0.32}, ${L(g.jW)} ${g.jY}`,
+    `C ${L(g.jW)} ${g.jY+c*0.5}, ${L(g.chW)} ${g.chY}, ${CX} ${g.chY}`,
+    `C ${R(g.chW)} ${g.chY}, ${R(g.jW)} ${g.jY+c*0.5}, ${R(g.jW)} ${g.jY}`,
+    `C ${R(g.jW)} ${g.jY-b*0.32}, ${R(g.cW)} ${g.cY+b*0.44}, ${R(g.cW)} ${g.cY}`,
+    `C ${R(g.cW)} ${g.tY+a*0.34}, ${R(g.tW)} ${g.tY}, ${CX} ${g.tY}`,
+    'Z'
+  ].join(' ');
+}
+
+/* ============================================================
+   HAIR — each entry returns an SVG fragment.
+   back()  draws behind the head, front() draws over it.
+   ============================================================ */
+const CAP = 'M 148 264 C 141 168, 190 110, 256 110 C 322 110, 371 168, 364 264 '
+          + 'C 357 214, 336 180, 256 180 C 176 180, 155 214, 148 264 Z';
+
+function shade(hex, amt){                    // lighten (+) / darken (-) a hex colour
+  const n = parseInt(hex.slice(1),16);
+  const f = v => clamp(Math.round(v + 255*amt), 0, 255);
+  return '#' + [f(n>>16&255), f(n>>8&255), f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+const HAIRS = [
+  {n:'Bald', front:c=>``},
+
+  {n:'Buzz', front:c=>`<path d="M 147 266 C 140 170, 190 112, 256 112 C 322 112, 372 170, 365 266
+     C 357 218, 334 188, 256 188 C 178 188, 155 218, 147 266 Z" fill="${c}"/>`},
+
+  {n:'Crew', front:c=>`<path d="${CAP}" fill="${c}"/>
+     <path d="M 176 186 C 200 168, 312 168, 336 186 C 312 176, 200 176, 176 186 Z" fill="${shade(c,.07)}"/>`},
+
+  {n:'Spiky', front:c=>`<path d="M 148 268 C 141 190, 168 136, 200 126 L 196 92 L 226 120 L 232 84
+     L 258 118 L 272 86 L 292 122 L 320 100 L 320 132 C 352 152, 371 196, 364 268
+     C 357 216, 336 182, 256 182 C 176 182, 155 216, 148 268 Z" fill="${c}"/>`},
+
+  {n:'Side Part', front:c=>`<path d="M 148 268 C 141 168, 190 108, 256 108 C 326 108, 372 168, 364 268
+     C 358 218, 340 186, 300 180 C 268 176, 214 206, 186 224 C 168 236, 156 252, 148 268 Z" fill="${c}"/>
+     <path d="M 300 180 C 268 176, 214 206, 186 224 C 226 200, 268 188, 302 190 Z" fill="${shade(c,.08)}"/>`},
+
+  {n:'Bowl', front:c=>`<path d="M 144 250 C 138 156, 190 104, 256 104 C 322 104, 374 156, 368 250
+     L 368 214 C 340 196, 172 196, 144 214 Z" fill="${c}"/>
+     <path d="M 144 214 C 172 196, 340 196, 368 214 L 368 250 C 366 226, 356 214, 256 214
+     C 156 214, 146 226, 144 250 Z" fill="${c}"/>`},
+
+  {n:'Messy', front:c=>`<path d="M 146 270 C 138 176, 186 106, 256 106 C 328 106, 374 176, 366 270
+     C 360 234, 348 206, 330 198 Q 314 220 300 196 Q 284 220 266 194 Q 248 218 230 194
+     Q 212 218 194 198 C 170 210, 152 236, 146 270 Z" fill="${c}"/>`},
+
+  {n:'Slick', front:c=>`<path d="M 148 266 C 136 154, 186 96, 250 94 C 292 92, 318 108, 322 96
+     C 340 108, 372 158, 364 266 C 356 208, 336 180, 256 180 C 184 180, 158 210, 148 266 Z" fill="${c}"/>
+     <path d="M 172 176 C 196 138, 268 116, 330 122" fill="none" stroke="${shade(c,.15)}"
+       stroke-width="8" stroke-linecap="round"/>
+     <path d="M 176 202 C 202 164, 272 142, 340 150" fill="none" stroke="${shade(c,.1)}"
+       stroke-width="7" stroke-linecap="round"/>
+     <path d="M 186 224 C 212 190, 282 170, 348 180" fill="none" stroke="${shade(c,.07)}"
+       stroke-width="6" stroke-linecap="round"/>`},
+
+  {n:'Afro', front:c=>`<path d="M 256 76 C 172 76, 116 134, 116 208 C 116 258, 140 292, 172 300
+     C 168 264, 176 214, 256 214 C 336 214, 344 264, 340 300 C 372 292, 396 258, 396 208
+     C 396 134, 340 76, 256 76 Z" fill="${c}"/>
+     <circle cx="168" cy="150" r="34" fill="${c}"/><circle cx="344" cy="150" r="34" fill="${c}"/>
+     <circle cx="212" cy="104" r="34" fill="${c}"/><circle cx="300" cy="104" r="34" fill="${c}"/>
+     <circle cx="256" cy="92"  r="34" fill="${c}"/>
+     <circle cx="140" cy="214" r="30" fill="${c}"/><circle cx="372" cy="214" r="30" fill="${c}"/>`},
+
+  {n:'Curly', front:c=>`<path d="${CAP}" fill="${c}"/>
+     <circle cx="168" cy="176" r="26" fill="${c}"/><circle cx="214" cy="140" r="30" fill="${c}"/>
+     <circle cx="256" cy="124" r="30" fill="${c}"/><circle cx="298" cy="140" r="30" fill="${c}"/>
+     <circle cx="344" cy="176" r="26" fill="${c}"/><circle cx="150" cy="222" r="22" fill="${c}"/>
+     <circle cx="362" cy="222" r="22" fill="${c}"/>`},
+
+  {n:'Long', back:c=>`<path d="M 152 200 C 136 300, 138 420, 154 486 L 208 486 C 194 416, 192 300, 196 232 Z
+     M 360 200 C 376 300, 374 420, 358 486 L 304 486 C 318 416, 320 300, 316 232 Z" fill="${c}"/>
+     <path d="M 150 210 C 140 320, 146 420, 158 486 L 354 486 C 366 420, 372 320, 362 210 Z" fill="${shade(c,-.05)}"/>`,
+   front:c=>`<path d="M 146 274 C 138 166, 190 104, 256 104 C 322 104, 374 166, 366 274
+     C 360 216, 340 182, 306 178 C 286 200, 236 210, 196 200 C 172 210, 154 234, 146 274 Z" fill="${c}"/>`},
+
+  {n:'Bob', back:c=>`<path d="M 148 220 C 130 300, 132 372, 146 404 L 366 404 C 380 372, 382 300, 364 220 Z" fill="${shade(c,-.05)}"/>`,
+   front:c=>`<path d="M 144 300 C 134 170, 190 102, 256 102 C 322 102, 378 170, 368 300
+     C 360 222, 342 182, 256 182 C 170 182, 152 222, 144 300 Z" fill="${c}"/>`},
+
+  {n:'Ponytail', back:c=>`<path d="M 352 200 C 400 214, 418 268, 406 330 C 398 372, 372 396, 350 386
+     C 372 350, 376 268, 344 230 Z" fill="${c}"/>`,
+   front:c=>`<path d="M 148 264 C 140 158, 192 104, 256 104 C 322 104, 372 158, 364 264
+     C 356 206, 336 178, 256 178 C 178 178, 156 206, 148 264 Z" fill="${c}"/>
+     <path d="M 200 152 C 236 130, 288 132, 320 156 C 284 142, 236 140, 200 152 Z" fill="${shade(c,.08)}"/>`},
+
+  {n:'Pigtails', back:c=>`<ellipse cx="128" cy="294" rx="38" ry="56" fill="${c}"/>
+     <ellipse cx="384" cy="294" rx="38" ry="56" fill="${c}"/>`,
+   front:c=>`<path d="${CAP}" fill="${c}"/>
+     <path d="M 154 202 C 126 210, 110 238, 112 264 C 132 234, 152 220, 172 214 Z" fill="${c}"/>
+     <path d="M 358 202 C 386 210, 402 238, 400 264 C 380 234, 360 220, 340 214 Z" fill="${c}"/>
+     <rect x="96" y="238" width="34" height="15" rx="7.5" fill="${shade(c,-.14)}"/>
+     <rect x="382" y="238" width="34" height="15" rx="7.5" fill="${shade(c,-.14)}"/>`},
+
+  {n:'Mohawk', front:c=>`<path d="M 216 198 C 206 130, 228 80, 256 58 C 284 80, 306 130, 296 198 Z" fill="${c}"/>
+     <path d="M 216 198 C 212 152, 230 106, 256 78 C 244 122, 236 160, 236 198 Z" fill="${shade(c,.09)}"/>
+     <path d="M 150 262 C 148 226, 164 198, 200 188 L 204 214 C 176 222, 158 240, 150 262 Z"
+       fill="${c}" opacity=".42"/>
+     <path d="M 362 262 C 364 226, 348 198, 312 188 L 308 214 C 336 222, 354 240, 362 262 Z"
+       fill="${c}" opacity=".42"/>`},
+
+  {n:'Wavy Long', back:c=>`<path d="M 148 210 C 122 300, 128 420, 148 492 L 194 492
+     C 176 428, 172 320, 186 240 Z M 364 210 C 390 300, 384 420, 364 492 L 318 492
+     C 336 428, 340 320, 326 240 Z" fill="${c}"/>
+     <path d="M 152 220 C 134 330, 140 428, 156 492 L 356 492 C 374 428, 378 330, 360 220 Z" fill="${shade(c,-.05)}"/>`,
+   front:c=>`<path d="M 146 276 C 136 162, 190 100, 256 100 C 322 100, 376 162, 366 276
+     C 358 216, 344 184, 316 178 C 292 202, 268 196, 250 182 C 224 194, 190 196, 168 214
+     C 156 228, 149 250, 146 276 Z" fill="${c}"/>`},
+
+  {n:'Top Bun', front:c=>`<circle cx="256" cy="86" r="34" fill="${c}"/>
+     <path d="M 150 262 C 143 168, 192 108, 256 108 C 320 108, 369 168, 362 262
+     C 356 212, 334 180, 256 180 C 178 180, 156 212, 150 262 Z" fill="${c}"/>
+     <path d="M 232 118 C 244 108, 268 108, 280 118 C 268 112, 244 112, 232 118 Z" fill="${shade(c,.1)}"/>`},
+
+  {n:'Fringe', front:c=>`<path d="M 146 268 C 138 164, 190 102, 256 102 C 322 102, 374 164, 366 268
+     C 360 224, 344 194, 320 188 Q 304 226 288 192 Q 270 230 252 192 Q 234 226 216 192
+     C 180 200, 152 226, 146 268 Z" fill="${c}"/>`},
+
+  {n:'Receding', hl:172, front:c=>`<path d="M 148 274 C 140 172, 190 108, 256 108 C 322 108, 372 172, 364 274
+     C 358 226, 344 190, 304 176 C 286 178, 274 202, 256 202
+     C 238 202, 226 178, 208 176 C 168 190, 154 226, 148 274 Z" fill="${c}"/>`},
+
+  /* --- long, straight, with a blunt fringe and side curtains --- */
+  {n:'Blunt Long',
+   back:c=>`<path d="M 150 206 C 132 302, 138 424, 156 490 L 356 490 C 374 424, 380 302, 362 206 Z" fill="${shade(c,-.06)}"/>
+     <path d="M 152 202 C 138 300, 142 420, 158 486 L 206 486 C 192 414, 190 300, 196 234 Z
+              M 360 202 C 374 300, 370 420, 354 486 L 306 486 C 320 414, 322 300, 316 234 Z" fill="${c}"/>`,
+   front:c=>`<path d="M 142 348 C 134 166, 190 98, 256 98 C 322 98, 378 166, 370 348
+     L 342 336 C 348 258, 346 214, 344 206 L 168 206 C 166 214, 164 258, 170 336 Z" fill="${c}"/>`},
+
+  /* --- two textured afro puffs --- */
+  {n:'Afro Puffs',
+   back:c=>`<g fill="${c}">
+     <circle cx="150" cy="178" r="54"/><circle cx="120" cy="216" r="32"/><circle cx="124" cy="140" r="32"/>
+     <circle cx="184" cy="132" r="34"/><circle cx="180" cy="224" r="32"/><circle cx="204" cy="180" r="30"/>
+     <circle cx="362" cy="178" r="54"/><circle cx="392" cy="216" r="32"/><circle cx="388" cy="140" r="32"/>
+     <circle cx="328" cy="132" r="34"/><circle cx="332" cy="224" r="32"/><circle cx="308" cy="180" r="30"/></g>`,
+   front:c=>`<path d="M 152 262 C 146 178, 192 122, 256 122 C 320 122, 366 178, 360 262
+     C 354 212, 334 184, 256 184 C 178 184, 158 212, 152 262 Z" fill="${c}"/>
+     <g fill="${c}"><circle cx="206" cy="146" r="24"/><circle cx="256" cy="132" r="26"/>
+     <circle cx="306" cy="146" r="24"/></g>`},
+
+  /* --- voluminous loose ringlets --- */
+  {n:'Loose Curls',
+   front:c=>`<path d="M 144 268 C 134 168, 188 104, 256 104 C 324 104, 378 168, 368 268
+     C 360 216, 338 182, 256 182 C 174 182, 152 216, 144 268 Z" fill="${c}"/>
+     <g fill="${c}"><circle cx="178" cy="152" r="30"/><circle cx="218" cy="120" r="34"/>
+     <circle cx="262" cy="110" r="36"/><circle cx="306" cy="124" r="33"/><circle cx="342" cy="158" r="29"/>
+     <circle cx="156" cy="200" r="26"/><circle cx="358" cy="200" r="26"/>
+     <circle cx="194" cy="188" r="24"/><circle cx="320" cy="188" r="24"/></g>
+`},
+
+  /* --- short, neat, swept, high at the temples --- */
+  {n:'Tapered', hl:176,
+   front:c=>`<path d="M 150 262 C 144 172, 190 112, 256 112 C 322 112, 368 172, 362 262
+     C 356 212, 338 184, 292 178 C 260 173, 216 192, 188 202
+     C 168 210, 156 232, 150 262 Z" fill="${c}"/>
+     <path d="M 292 178 C 260 173, 216 192, 188 202 C 222 187, 262 180, 294 185 Z" fill="${shade(c,.09)}"/>`},
+
+  /* --- short textured crop, small irregular spikes --- */
+  {n:'Textured',
+   front:c=>`<path d="M 148 264 C 142 186, 174 132, 210 122
+     L 214 104 L 228 122 L 238 102 L 252 120 L 264 100 L 278 120 L 290 104 L 302 122 L 314 108 L 316 128
+     C 344 144, 368 192, 364 264 C 356 212, 334 180, 256 180 C 178 180, 156 212, 148 264 Z" fill="${c}"/>`}
+];
+
+/* ============================================================
+   FEATURES
+   Local space convention for paired parts:  +x = inner (nose side)
+   The right-hand copy is drawn with scale(-1,1) so asymmetric
+   styles mirror correctly, exactly like the real editor.
+   ============================================================ */
+
+const EYES = [
+  {n:'Default', d:c=>`<ellipse rx="21" ry="15.5" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="1" r="9.6" fill="${c}"/><circle cy="1" r="4.6" fill="#221c17"/>
+    <circle cx="-4.6" cy="-4.6" r="3.4" fill="#fff" opacity=".92"/>`},
+
+  {n:'Round', d:c=>`<circle r="18" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="1" r="10.5" fill="${c}"/><circle cy="1" r="5" fill="#221c17"/>
+    <circle cx="-5" cy="-5" r="3.8" fill="#fff" opacity=".92"/>`},
+
+  {n:'Narrow', d:c=>`<ellipse rx="23" ry="10" fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle r="8.2" fill="${c}"/><circle r="4" fill="#221c17"/>
+    <circle cx="-3.6" cy="-3" r="2.6" fill="#fff" opacity=".9"/>`},
+
+  {n:'Tall', d:c=>`<ellipse rx="16" ry="19" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="1" r="10" fill="${c}"/><circle cy="1" r="4.8" fill="#221c17"/>
+    <circle cx="-4" cy="-5.5" r="3.4" fill="#fff" opacity=".92"/>`},
+
+  {n:'Sleepy', d:c=>`<ellipse rx="21" ry="15" fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle cy="3" r="9" fill="${c}"/><circle cy="3" r="4.4" fill="#221c17"/>
+    <path d="M -22 -16 L 22 -16 L 22 -2 C 8 -6, -8 -6, -22 -2 Z" fill="${LINE}"/>`},
+
+  {n:'Angry', d:c=>`<ellipse rx="21" ry="15" fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle cy="2" r="9" fill="${c}"/><circle cy="2" r="4.4" fill="#221c17"/>
+    <path d="M -23 -18 L 23 -18 L 23 7 C 6 -3, -10 -12, -23 -12 Z" fill="${LINE}"/>`},
+
+  {n:'Sad', d:c=>`<ellipse rx="21" ry="15" fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle cy="2" r="9" fill="${c}"/><circle cy="2" r="4.4" fill="#221c17"/>
+    <path d="M -23 -18 L 23 -18 L 23 -12 C 10 -12, -6 -3, -23 7 Z" fill="${LINE}"/>`},
+
+  {n:'Happy', d:c=>`<path d="M -21 5 Q 0 -17 21 5" fill="none" stroke="${LINE}"
+    stroke-width="5.4" stroke-linecap="round"/>`},
+
+  {n:'Closed', d:c=>`<path d="M -21 0 L 21 0" fill="none" stroke="${LINE}"
+    stroke-width="5.4" stroke-linecap="round"/>`},
+
+  {n:'Beady', d:c=>`<circle r="11.5" fill="${LINE}"/><circle cy="-1" r="6.2" fill="${c}"/>
+    <circle cx="-3.6" cy="-4" r="2.9" fill="#fff" opacity=".9"/>`},
+
+  {n:'Almond', d:c=>`<path d="M -24 0 C -16 -13, 16 -13, 24 0 C 16 13, -16 13, -24 0 Z"
+    fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle r="9" fill="${c}"/><circle r="4.4" fill="#221c17"/>
+    <circle cx="-4" cy="-4" r="3" fill="#fff" opacity=".9"/>`},
+
+  {n:'Sharp', d:c=>`<path d="M -25 2 C -18 -14, 14 -16, 24 -3 C 18 12, -14 14, -25 2 Z"
+    fill="#fff" stroke="${LINE}" stroke-width="3.2"/>
+    <circle cx="-2" cy="-1" r="9.2" fill="${c}"/><circle cx="-2" cy="-1" r="4.4" fill="#221c17"/>
+    <circle cx="-6" cy="-5" r="3" fill="#fff" opacity=".9"/>`},
+
+  {n:'Sparkle', d:c=>`<ellipse rx="20" ry="17" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="1" r="11" fill="${c}"/><circle cy="1" r="5" fill="#221c17"/>
+    <circle cx="-5" cy="-5.5" r="4.2" fill="#fff"/><circle cx="5" cy="6" r="2.4" fill="#fff" opacity=".85"/>`},
+
+  {n:'Lashes', d:c=>`<ellipse rx="21" ry="15.5" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="1" r="9.6" fill="${c}"/><circle cy="1" r="4.6" fill="#221c17"/>
+    <circle cx="-4.6" cy="-4.6" r="3.2" fill="#fff" opacity=".92"/>
+    <path d="M -21 -10 L -30 -18 M -14 -14 L -19 -24 M -5 -16 L -7 -26"
+      stroke="${LINE}" stroke-width="3.4" stroke-linecap="round" fill="none"/>`}
+];
+
+const BROWS = [
+  {n:'Straight',  d:c=>`<rect x="-26" y="-5.5" width="52" height="11.5" rx="5.8" fill="${c}"/>`},
+  {n:'Thin',      d:c=>`<rect x="-28" y="-3.5" width="56" height="7.5" rx="3.8" fill="${c}"/>`},
+  {n:'Bushy',     d:c=>`<path d="M -29 -9 Q 0 -15 29 -8 L 29 8 Q 14 3, 0 8 Q -14 13, -29 9 Z" fill="${c}"/>`},
+  {n:'Angry',     d:c=>`<path d="M -29 -8 L 29 3 L 29 15 L -29 5 Z" fill="${c}"/>`},
+  {n:'Worried',   d:c=>`<path d="M -29 4 L 29 -8 L 29 3 L -29 15 Z" fill="${c}"/>`},
+  {n:'Arched',    d:c=>`<path d="M -28 8 Q 0 -15 28 7 L 28 16 Q 0 -4, -28 17 Z" fill="${c}"/>`},
+  {n:'High Arch', d:c=>`<path d="M -27 10 Q 0 -14 27 9 L 27 15 Q 0 -6, -27 16 Z" fill="${c}"/>`},
+  {n:'Tapered',   d:c=>`<path d="M -30 2 Q -6 -10 27 -5 L 29 5 Q -4 0, -30 10 Z" fill="${c}"/>`},
+  {n:'Short',     d:c=>`<rect x="-19" y="-6" width="38" height="12.5" rx="6" fill="${c}"/>`},
+  {n:'Blob',      d:c=>`<ellipse rx="20" ry="9" fill="${c}"/>`},
+  {n:'Sharp',     d:c=>`<path d="M -30 6 L 22 -9 L 29 -2 L -28 14 Z" fill="${c}"/>`},
+  {n:'Wavy',      d:c=>`<path d="M -29 0 Q -15 -12 0 -3 Q 15 6 29 -5 L 29 6 Q 15 16 0 8 Q -15 0 -29 11 Z" fill="${c}"/>`}
+];
+
+const NOSES = [
+  {n:'Rounded',  d:w=>`<path d="M -13 10 C -13 0, -5 -10, 0 -16 C 5 -10, 13 0, 13 10
+    C 13 17, 6 19, 0 19 C -6 19, -13 17, -13 10 Z" fill="none" stroke="${LINE}"
+    stroke-width="${w}" stroke-linejoin="round"/>`},
+  {n:'Arc',      d:w=>`<path d="M -16 -2 C -14 10, 14 10, 16 -2" fill="none" stroke="${LINE}"
+    stroke-width="${w*1.1}" stroke-linecap="round"/>`},
+  {n:'Upturned', d:w=>`<path d="M -14 12 C -14 2, -6 -8, 0 -12 C 6 -8, 14 2, 14 12"
+    fill="none" stroke="${LINE}" stroke-width="${w}" stroke-linecap="round"/>
+    <ellipse cx="-7" cy="13" rx="4" ry="3" fill="${LINE}"/><ellipse cx="7" cy="13" rx="4" ry="3" fill="${LINE}"/>`},
+  {n:'Hook',     d:w=>`<path d="M -10 14 C -12 0, -6 -14, 2 -20 C 10 -12, 13 2, 12 12
+    C 11 19, 4 21, -1 20 C -6 19, -9 18, -10 14 Z" fill="none" stroke="${LINE}"
+    stroke-width="${w}" stroke-linejoin="round"/>`},
+  {n:'Nostrils', d:w=>`<ellipse cx="-8" cy="6" rx="4.6" ry="3.6" fill="${LINE}"/>
+    <ellipse cx="8" cy="6" rx="4.6" ry="3.6" fill="${LINE}"/>`},
+  {n:'Triangle', d:w=>`<path d="M 0 -14 L 14 14 L -14 14 Z" fill="none" stroke="${LINE}"
+    stroke-width="${w}" stroke-linejoin="round"/>`}
+];
+
+const MOUTHS = [
+  {n:'Smile',   d:c=>`<path d="M -27 -5 Q 0 17 27 -5" fill="none" stroke="${LINE}"
+    stroke-width="5.2" stroke-linecap="round"/>`},
+  {n:'Neutral', d:c=>`<path d="M -24 0 L 24 0" fill="none" stroke="${LINE}"
+    stroke-width="5.2" stroke-linecap="round"/>`},
+  {n:'Frown',   d:c=>`<path d="M -25 6 Q 0 -14 25 6" fill="none" stroke="${LINE}"
+    stroke-width="5.2" stroke-linecap="round"/>`},
+  {n:'Grin',    d:c=>`<path d="M -31 -7 L 31 -7 Q 27 20 0 22 Q -27 20 -31 -7 Z" fill="${LINE}"/>
+    <path d="M -27 -4 L 27 -4 L 25 5 L -25 5 Z" fill="#fff"/>`},
+  {n:'Open',    d:c=>`<ellipse rx="23" ry="17" fill="${LINE}"/>
+    <path d="M -20 -13 L 20 -13 L 19 -4 L -19 -4 Z" fill="#fff"/>
+    <ellipse cy="10" rx="11.5" ry="6" fill="${c}"/>`},
+  {n:'Small O',  d:c=>`<ellipse rx="10" ry="12" fill="${LINE}"/><ellipse rx="6" ry="7.5" cy="2" fill="${c}"/>`},
+  {n:'Smirk',   d:c=>`<path d="M -24 2 Q 2 12 26 -8" fill="none" stroke="${LINE}"
+    stroke-width="5.2" stroke-linecap="round"/>`},
+  {n:'Wavy',    d:c=>`<path d="M -26 2 Q -13 -10 0 2 Q 13 14 26 2" fill="none" stroke="${LINE}"
+    stroke-width="5" stroke-linecap="round"/>`},
+  {n:'Laugh',   d:c=>`<path d="M -26 -12 Q 0 -20 26 -12 Q 30 24, 0 26 Q -30 24, -26 -12 Z" fill="${LINE}"/>
+    <path d="M -21 -10 Q 0 -16 21 -10 L 19 -3 Q 0 0 -19 -3 Z" fill="#fff"/>
+    <path d="M -14 13 Q 0 26 14 13 Q 0 7 -14 13 Z" fill="${c}"/>`},
+  {n:'Lips',    d:c=>`<path d="M -25 -1 Q -14 -12 -6 -4 Q 0 -9 6 -4 Q 14 -12 25 -1
+    Q 12 15 0 15 Q -12 15 -25 -1 Z" fill="${c}" stroke="${LINE}" stroke-width="2.4"/>
+    <path d="M -25 -1 Q 0 6 25 -1" fill="none" stroke="${LINE}" stroke-width="2" opacity=".55"/>`},
+  {n:'Pout',    d:c=>`<path d="M -14 -4 Q 0 -12 14 -4 Q 18 10 0 13 Q -18 10 -14 -4 Z"
+    fill="${c}" stroke="${LINE}" stroke-width="2.6"/>`},
+  {n:'Cat',     d:c=>`<path d="M -24 -4 Q -12 10 0 -2 Q 12 10 24 -4" fill="none" stroke="${LINE}"
+    stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`},
+  {n:'Teeth',   d:c=>`<path d="M -26 -8 L 26 -8 Q 28 16, 0 18 Q -28 16, -26 -8 Z" fill="${LINE}"/>
+    <rect x="-22" y="-6" width="44" height="10" fill="#fff"/>
+    <path d="M -8 -6 L -8 4 M 8 -6 L 8 4" stroke="${LINE}" stroke-width="1.6"/>`},
+  {n:'Tongue',  d:c=>`<path d="M -24 -6 Q 0 -12 24 -6 Q 26 12, 0 14 Q -26 12, -24 -6 Z" fill="${LINE}"/>
+    <path d="M -13 6 Q 0 30 13 6 Q 0 0 -13 6 Z" fill="${c}"/>`}
+];
+
+const MUSTACHES = [
+  {n:'None',      d:c=>``},
+  {n:'Pencil',    d:c=>`<path d="M -28 -2 Q 0 -12 28 -2 Q 0 5 -28 -2 Z" fill="${c}"/>`},
+  {n:'Chevron',   d:c=>`<path d="M 0 -8 Q 20 -7 33 6 Q 17 4 0 11 Q -17 4 -33 6 Q -20 -7 0 -8 Z" fill="${c}"/>`},
+  {n:'Handlebar', d:c=>`<path d="M 0 -5 Q 17 -9 29 -5 Q 43 0 41 12 Q 37 2 27 3 Q 13 4 0 11
+    Q -13 4 -27 3 Q -37 2 -41 12 Q -43 0 -29 -5 Q -17 -9 0 -5 Z" fill="${c}"/>`},
+  {n:'Walrus',    d:c=>`<path d="M -35 -5 Q 0 -14 35 -5 Q 35 19 17 24 Q 0 11 -17 24 Q -35 19 -35 -5 Z" fill="${c}"/>`},
+  {n:'Toothbrush',d:c=>`<rect x="-13" y="-6" width="26" height="17" rx="4.5" fill="${c}"/>`},
+  {n:'Horseshoe', d:c=>`<path d="M -33 -10 Q 0 -17 33 -10 L 33 4 Q 0 0 -33 4 Z" fill="${c}"/>
+    <path d="M -34 0 L -23 1 Q -21 19 -24 35 L -35 34 Q -36 17 -34 0 Z" fill="${c}"/>
+    <path d="M 34 0 L 23 1 Q 21 19 24 35 L 35 34 Q 36 17 34 0 Z" fill="${c}"/>`},
+  {n:'Curled',    d:c=>`<path d="M 0 -4 Q 16 -9 27 -4 Q 40 3 33 13 Q 36 4 26 4 Q 12 5 0 11
+    Q -12 5 -26 4 Q -36 4 -33 13 Q -40 3 -27 -4 Q -16 -9 0 -4 Z" fill="${c}"/>`},
+  {n:'Brush',     d:c=>`<path d="M -24 -6 Q 0 -12 24 -6 Q 26 10 0 13 Q -26 10 -24 -6 Z" fill="${c}"/>`}
+];
+
+/* Beards are drawn INSIDE a clip-path of the live face outline, so they
+   follow whatever jaw shape is selected.  `clip` = inside the face,
+   `free` = allowed to hang past the chin. */
+const BEARDS = [
+  {n:'None'},
+
+  {n:'Stubble', clip:(c,g,s)=>`<path d="M 104 ${g.chY+90} L 104 ${g.cY+34}
+    Q ${CX} ${g.cY+140} 408 ${g.cY+34} L 408 ${g.chY+90} Z" fill="${c}" opacity=".3"/>`},
+
+  {n:'Soul Patch', clip:(c,g,s)=>`<ellipse cx="${CX}" cy="${g.mouthY+24}" rx="10" ry="13" fill="${c}"/>`},
+
+  {n:'Goatee', clip:(c,g,s)=>`<path d="M ${CX-34} ${g.mouthY-26} Q ${CX} ${g.mouthY-12} ${CX+34} ${g.mouthY-26}
+    Q ${CX+40} ${g.chY+16} ${CX} ${g.chY+22} Q ${CX-40} ${g.chY+16} ${CX-34} ${g.mouthY-26} Z" fill="${c}"/>
+    <ellipse cx="${g.mouthX}" cy="${g.mouthY}" rx="30" ry="17" fill="${s}"/>`},
+
+  {n:'Anchor', clip:(c,g,s)=>`<path d="M ${CX-25} ${g.mouthY+8} Q ${CX} ${g.mouthY+20} ${CX+25} ${g.mouthY+8}
+    Q ${CX+29} ${g.chY+14} ${CX} ${g.chY+20} Q ${CX-29} ${g.chY+14} ${CX-25} ${g.mouthY+8} Z" fill="${c}"/>
+    <path d="M ${CX-33} ${g.mouthY-24} Q ${CX} ${g.mouthY-11} ${CX+33} ${g.mouthY-24}
+    Q ${CX} ${g.mouthY-3} ${CX-33} ${g.mouthY-24} Z" fill="${c}"/>`},
+
+  {n:'Chin Strap', clip:(c,g,s)=>`<path d="M 104 ${g.chY+90} L 104 ${g.earY-18}
+    Q ${CX} ${g.cY+150} 408 ${g.earY-18} L 408 ${g.chY+90} Z" fill="${c}"/>
+    <path d="${g.fp}" fill="${s}" transform="translate(${CX},${(g.tY+g.chY)/2}) scale(.845)
+      translate(${-CX},${-(g.tY+g.chY)/2})"/>`},
+
+  {n:'Full', clip:(c,g,s)=>`<path d="M 104 ${g.chY+90} L 104 ${g.cY+34}
+    Q ${CX} ${g.cY+140} 408 ${g.cY+34} L 408 ${g.chY+90} Z" fill="${c}"/>
+    <ellipse cx="${g.mouthX}" cy="${g.mouthY}" rx="34" ry="19" fill="${s}"/>`},
+
+  {n:'Long',
+   clip:(c,g,s)=>`<path d="M 104 ${g.chY+90} L 104 ${g.cY+34}
+    Q ${CX} ${g.cY+140} 408 ${g.cY+34} L 408 ${g.chY+90} Z" fill="${c}"/>
+    <ellipse cx="${g.mouthX}" cy="${g.mouthY}" rx="34" ry="19" fill="${s}"/>`,
+   free:(c,g,s)=>`<path d="M ${CX-g.jW*0.9} ${g.chY-54} Q ${CX} ${g.chY+6} ${CX+g.jW*0.9} ${g.chY-54}
+    Q ${CX+g.jW*0.66} ${g.chY+116} ${CX} ${g.chY+146} Q ${CX-g.jW*0.66} ${g.chY+116} ${CX-g.jW*0.9} ${g.chY-54} Z" fill="${c}"/>`},
+
+  {n:'Mutton', clip:(c,g,s)=>`<path d="M 100 ${g.earY-46} L 198 ${g.earY-46}
+    Q 184 ${g.jY+14} 122 ${g.jY+26} Z" fill="${c}"/>
+    <path d="M 412 ${g.earY-46} L 314 ${g.earY-46} Q 328 ${g.jY+14} 390 ${g.jY+26} Z" fill="${c}"/>`},
+
+  {n:'Sideburns', clip:(c,g,s)=>`<rect x="100" y="${g.earY-52}" width="66" height="${g.jY-g.earY+96}" fill="${c}"/>
+    <rect x="346" y="${g.earY-52}" width="66" height="${g.jY-g.earY+96}" fill="${c}"/>`},
+
+  /* Speckled stubble. The jitter is a fixed hash of the grid position, not
+     Math.random, so the pattern is stable across re-renders. */
+  {n:'Stubble Dots', clip:(c,g,s)=>{
+    const COLS = 19, ROWS = 14;
+    let d = '';
+    for(let r = 0; r < ROWS; r++){
+      for(let q = 0; q < COLS; q++){
+        const jx = ((r*7 + q*13) % 5) - 2, jy = ((r*11 + q*5) % 5) - 2;
+        const x  = 124 + q*15 + (r % 2 ? 7.5 : 0) + jx;
+        const y  = g.cY + 8 + r*13 + jy;
+        /* Top edge traces a real beard line: high at the sideburn, sweeping down
+           across the cheek, then flat along the upper lip. */
+        const t    = Math.min(1, Math.max(0, (Math.abs(x - CX) - 34) / 66));
+        const yTop = (g.noseY + 18) - Math.pow(t, 1.6) * ((g.noseY + 18) - (g.cY + 16));
+        if(y < yTop) continue;
+        const lx = (x - g.mouthX) / 31, ly = (y - g.mouthY) / 14;
+        if(lx*lx + ly*ly < 1) continue;                    // lips stay bare
+        const rr = 1.8 + ((r*3 + q*7) % 3) * 0.4;
+        d += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr.toFixed(1)}"/>`;
+      }
+    }
+    return `<g fill="${c}" opacity=".8">${d}</g>`;
+  }}
+];
+
+/* Hats sit above the hair, scaled to the skull the same way the hair is.
+   d(c, a): c = main colour, a = accent (band, brim, shading). */
+const HATS = [
+  {n:'None'},
+
+  {n:'Headband', d:(c,a)=>`<path d="M 142 206 C 146 174, 194 152, 256 152 C 318 152, 366 174, 370 206
+    L 370 232 C 366 200, 318 178, 256 178 C 194 178, 146 200, 142 232 Z" fill="${c}"/>
+    <path d="M 238 154 L 274 154 L 274 180 L 238 180 Z" fill="${a}"/>`},
+
+  {n:'Top Hat', d:(c,a)=>`<path d="M 188 134 L 188 40 C 188 30, 200 24, 256 24
+    C 312 24, 324 30, 324 40 L 324 134 Z" fill="${c}"/>
+    <rect x="188" y="104" width="136" height="24" fill="${a}"/>
+    <ellipse cx="256" cy="136" rx="120" ry="21" fill="${c}"/>
+    <ellipse cx="256" cy="132" rx="120" ry="21" fill="${a}" opacity=".35"/>`},
+
+  {n:'Cap Forward', d:(c,a)=>`<path d="M 154 176 C 154 110, 198 80, 256 80 C 314 80, 358 110, 358 176 Z" fill="${c}"/>
+    <circle cx="256" cy="86" r="8" fill="${a}"/>
+    <path d="M 148 172 C 152 202, 202 216, 256 216 C 310 216, 360 202, 364 172
+    C 348 186, 308 194, 256 194 C 204 194, 164 186, 148 172 Z" fill="${a}"/>`},
+
+  {n:'Cap Back', d:(c,a)=>`<path d="M 154 178 C 154 112, 198 82, 256 82 C 314 82, 358 112, 358 178 Z" fill="${c}"/>
+    <path d="M 156 178 C 156 164, 158 152, 162 144 L 350 144 C 354 152, 356 164, 356 178 Z" fill="${a}"/>
+    <rect x="234" y="144" width="44" height="36" rx="5" fill="${c}"/>
+    <circle cx="256" cy="88" r="8" fill="${a}"/>`},
+
+  {n:'Beanie', d:(c,a)=>`<path d="M 150 192 C 150 118, 196 90, 256 90 C 316 90, 362 118, 362 192 Z" fill="${c}"/>
+    <rect x="144" y="176" width="224" height="32" rx="15" fill="${a}"/>
+    <circle cx="256" cy="80" r="18" fill="${a}"/>`},
+
+  {n:'Headphones', d:(c,a)=>`<path d="M 148 258 C 144 158, 196 116, 256 116 C 316 116, 368 158, 364 258"
+    fill="none" stroke="${c}" stroke-width="20" stroke-linecap="round"/>
+    <rect x="118" y="232" width="50" height="76" rx="22" fill="${a}"/>
+    <rect x="344" y="232" width="50" height="76" rx="22" fill="${a}"/>
+    <rect x="130" y="246" width="26" height="48" rx="12" fill="${c}" opacity=".55"/>
+    <rect x="356" y="246" width="26" height="48" rx="12" fill="${c}" opacity=".55"/>`},
+
+  {n:'Shades Up', d:(c,a)=>`<path d="M 148 172 C 172 134, 340 134, 364 172" fill="none"
+    stroke="${a}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 150 164 C 172 140, 244 134, 252 158 C 258 182, 226 200, 190 197
+    C 158 194, 147 180, 150 164 Z" fill="${c}"/>
+    <path d="M 362 164 C 340 140, 268 134, 260 158 C 254 182, 286 200, 322 197
+    C 354 194, 365 180, 362 164 Z" fill="${c}"/>
+    <path d="M 252 155 L 260 155" stroke="${a}" stroke-width="9" stroke-linecap="round"/>`}
+];
+
+const JEWELC = ['#e0b23c'];          // gold, plus the wheel for anything else
+
+/* Jewellery is additive: each piece is its own toggle, so combinations do not
+   have to be enumerated. Ear pieces are drawn in the ear's own space
+   (+x = outward, +y = down the lobe); neck pieces sit on the chest. */
+const JEWEL_KEYS = ['cartL','cartR','studL','studR','dropL','dropR','necklace','choker'];
+const JEWEL_EAR = {
+  cart: c=>`<circle cx="11" cy="-9" r="4.8" fill="none" stroke="${c}" stroke-width="2.6"/>`,
+  stud: c=>`<circle cx="1" cy="18" r="3.6" fill="${c}"/>`,
+  drop: c=>`<circle cx="1" cy="17" r="3" fill="${c}"/>
+            <path d="M 1 19 L 1 27" stroke="${c}" stroke-width="2.2"/>
+            <ellipse cx="1" cy="33" rx="5" ry="7" fill="${c}"/>`
+};
+
+const GLASSES = [
+  {n:'None',  d:c=>``},
+  {n:'Round', d:c=>`<circle cx="-38" cy="0" r="25" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <circle cx="38" cy="0" r="25" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <path d="M -13 0 L 13 0 M -63 -4 L -86 -12 M 63 -4 L 86 -12" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`},
+  {n:'Square',d:c=>`<rect x="-64" y="-24" width="52" height="48" rx="7" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <rect x="12" y="-24" width="52" height="48" rx="7" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <path d="M -12 -4 L 12 -4 M -64 -12 L -86 -18 M 64 -12 L 86 -18" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`},
+  {n:'Rect',  d:c=>`<rect x="-66" y="-17" width="56" height="34" rx="5" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.6"/>
+    <rect x="10" y="-17" width="56" height="34" rx="5" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.6"/>
+    <path d="M -10 -6 L 10 -6 M -66 -8 L -88 -14 M 66 -8 L 88 -14" stroke="${c}" stroke-width="4.6" stroke-linecap="round"/>`},
+  {n:'Shades',d:c=>`<path d="M -70 -20 L -10 -20 Q -6 -20 -6 -14 Q -6 18 -34 20 Q -66 22 -70 -6 Z" fill="${c}"/>
+    <path d="M 70 -20 L 10 -20 Q 6 -20 6 -14 Q 6 18 34 20 Q 66 22 70 -6 Z" fill="${c}"/>
+    <path d="M -6 -16 L 6 -16 M -70 -16 L -90 -22 M 70 -16 L 90 -22" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`},
+  {n:'Half',  d:c=>`<path d="M -66 -14 L -10 -14 M 10 -14 L 66 -14" stroke="${c}" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M -66 -14 Q -64 20 -38 21 Q -12 20 -10 -14 M 66 -14 Q 64 20 38 21 Q 12 20 10 -14"
+      fill="#fff" fill-opacity=".18" stroke="${c}" stroke-width="2.4"/>
+    <path d="M -10 -14 L 10 -14 M -66 -14 L -88 -20 M 66 -14 L 88 -20" stroke="${c}" stroke-width="4.4" stroke-linecap="round"/>`},
+  {n:'Oval',  d:c=>`<ellipse cx="-38" cy="0" rx="29" ry="21" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <ellipse cx="38" cy="0" rx="29" ry="21" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <path d="M -9 0 L 9 0 M -67 -6 L -88 -13 M 67 -6 L 88 -13" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`},
+  {n:'Thick', d:c=>`<rect x="-68" y="-25" width="58" height="50" rx="10" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="9"/>
+    <rect x="10" y="-25" width="58" height="50" rx="10" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="9"/>
+    <path d="M -10 -8 L 10 -8" stroke="${c}" stroke-width="9" stroke-linecap="round"/>
+    <path d="M -68 -14 L -90 -20 M 68 -14 L 90 -20" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`},
+  {n:'Aviator',d:c=>`<path d="M -68 -16 Q -66 22 -38 23 Q -10 22 -10 -8 Q -10 -16 -20 -16 Z"
+      fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.6"/>
+    <path d="M 68 -16 Q 66 22 38 23 Q 10 22 10 -8 Q 10 -16 20 -16 Z"
+      fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.6"/>
+    <path d="M -10 -12 Q 0 -18 10 -12 M -68 -16 L -90 -22 M 68 -16 L 90 -22"
+      fill="none" stroke="${c}" stroke-width="4.6" stroke-linecap="round"/>`},
+  {n:'Star',  d:c=>`<path d="M -38 -26 L -31 -9 L -13 -8 L -27 3 L -22 21 L -38 11 L -54 21 L -49 3
+      L -63 -8 L -45 -9 Z" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.4" stroke-linejoin="round"/>
+    <path d="M 38 -26 L 45 -9 L 63 -8 L 49 3 L 54 21 L 38 11 L 22 21 L 27 3
+      L 13 -8 L 31 -9 Z" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="4.4" stroke-linejoin="round"/>`},
+  {n:'Visor', d:c=>`<path d="M -78 -14 Q 0 -26 78 -14 Q 76 20 0 22 Q -76 20 -78 -14 Z"
+      fill="${c}" fill-opacity=".85" stroke="${c}" stroke-width="4"/>
+    <path d="M -70 -10 Q 0 -20 70 -10" fill="none" stroke="#fff" stroke-width="4" opacity=".35"/>`},
+  {n:'Monocle',d:c=>`<circle cx="38" cy="0" r="27" fill="#fff" fill-opacity=".2" stroke="${c}" stroke-width="5"/>
+    <path d="M 38 27 Q 34 56 12 66" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round"/>`}
+];
+
+/* ============================================================
+   BODY PROPORTIONS  —  one source of truth so svgMii() and the
+   stage viewBox always agree on where the feet end up.
+   ============================================================ */
+function bodyGeom(m){
+  const bw = m.body.build, bh = m.body.height;
+  const shoulderY = 392;                    // head sits straight on the body, almost no neck
+  const waistY    = shoulderY + 172*bh;
+  const hipY      = waistY + 12*bh;
+  const legBotY   = hipY + 116*bh;
+  return {
+    bw, bh, shoulderY, waistY, hipY, legBotY,
+    shoulderHalf: 74*bw,                    // ~69% of head width, as in the reference
+    waistHalf:    68*bw,
+    hipHalf:      64*bw,                    // narrower than the shirt waist, so it hides behind it
+    armW:         17*bw,
+    handR:        22*bw,
+    legW:         26*bw,
+    legTopX:      38*bw,                    // legs emerge at the full width of the hips
+    legBotX:      44*bw,
+    footR:        29*bw,
+    bottom: legBotY + 29*bw + 30
+  };
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+/* The starter Mii: long black hair with a blunt fringe, cream top, and the
+   rust trousers the Favorite colour was sampled from. */
+const DEFAULT = () => ({
+  name:'Celine', creator:'', favorite:true, mingle:true,
+  birthday:{m:1, d:1}, skin:2,
+  face   :{shape:0, size:1, width:1.02, jaw:1},
+  hair   :{style:19, color:0, y:0, size:1, flip:false},
+  brows  :{style:7, color:0, y:4.5, spacing:1, size:.9, rot:0},
+  eyes   :{style:0, color:1, y:0, spacing:1, size:1.02, stretch:1, rot:0},
+  nose   :{style:0, x:0, y:2, size:.88, width:.95},
+  mouth  :{style:3, color:0, x:0, y:3, size:.95, stretch:1.05},
+  beard  :{must:0, style:0, color:0, size:1, y:0},
+  glasses:{style:0, color:0, y:0, size:1},
+  hat    :{style:0, color:11},
+  jewel  :{color:0, cartL:true, cartR:false, studL:false, studR:false,
+           dropL:true, dropR:true, necklace:false, choker:false},
+  mole   :{on:true, x:-85, y:15, size:.69},        // dimple, left cheek
+  body   :{color:10, pants:3, shoes:0, dress:false, build:.95, height:1}
+});
+
+const get=(o,p)=>p.split('.').reduce((a,k)=>a[k],o);
+const set=(o,p,v)=>{const k=p.split('.');const l=k.pop();k.reduce((a,x)=>a[x],o)[l]=v;};
+let M = DEFAULT();
+let uidN = 0;
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function svgMii(m, mono){
+  const uid = 'u'+(uidN++);
+  const g   = faceGeom(m);
+  const inv = mono === 2;                       // white line art, for a selected tile
+  const INV_INK = '#fffffe';        // reads as white; dodges the knockout pass at the end
+  LINE = mono ? (inv ? INV_INK : '#33383c') : INK_BASE;
+  const INK = inv ? INV_INK : '#33383c';
+  const skin= mono ? (inv ? 'none' : '#ffffff') : pick(SKINS, m.skin);
+  const hc  = mono ? INK : pick(HAIRC, m.hair.color);
+  const bwc = mono ? INK : pick(HAIRC, m.brows.color);
+  const fhc = mono ? INK : pick(HAIRC, m.beard.color);
+  const ec  = mono ? (inv ? 'none' : '#3d4247') : pick(EYEC, m.eyes.color);
+  const mc  = mono ? (inv ? 'none' : '#ffffff') : pick(MOUTHC, m.mouth.color);
+  const gc  = mono ? INK : pick(GLASSC, m.glasses.color);
+  const sc  = mono ? (inv ? 'none' : '#ffffff') : pick(SHIRTC, m.body.color);
+  const fp = facePath(g);
+  const hair=HAIRS[m.hair.style], beard=BEARDS[m.beard.style], must=MUSTACHES[m.beard.must];
+
+  const eyeY=262+m.eyes.y,  eyeSp=36+m.eyes.spacing;
+  const browY=220+m.brows.y, browSp=40+m.brows.spacing;
+  const noseY=302+m.nose.y,  noseX =CX+m.nose.x;
+  const mouthY=344+m.mouth.y, mouthX=CX+m.mouth.x;
+  const mustY=mouthY-21+m.beard.y;
+
+  /* mirrored pair helper — local +x always points toward the nose */
+  const pair=(inner,y,sp,sx,sy,rot)=>
+    `<g transform="translate(${CX-sp},${y}) scale(${sx},${sy}) rotate(${rot})">${inner}</g>`+
+    `<g transform="translate(${CX+sp},${y}) scale(${-sx},${sy}) rotate(${rot})">${inner}</g>`;
+
+  /* ---- body: shaded torso + limbs, spherical hands / feet ---- */
+  const b  = bodyGeom(m);
+  const pc = mono ? (inv ? 'none' : '#ffffff') : (m.favorite ? FAV_PANTS : pick(PANTSC, m.body.pants));
+  const J  = m.jewel;
+  const jc = mono ? LINE : pick(JEWELC, J.color);
+  const shc = mono ? (inv ? 'none' : '#ffffff') : pick(SHOEC, m.body.shoes);
+  const g3 = mono ? 'none' : `url(#b3${uid})`;
+  const edge = mono ? `stroke="${LINE}" stroke-width="4"` : 'stroke="rgba(0,0,0,.07)" stroke-width="2"';                       // single light source across the whole body
+
+  const sph = (cx,cy,r,fill) => mono
+    ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${LINE}" stroke-width="4"/>`
+    : `<ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${r}" fill="${fill}"/>
+       <ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${r}" fill="url(#sp${uid})"/>`;
+  const tube = (d,w,fill) => fill === 'none' ? '' :
+    (mono ? `<path d="${d}" stroke="${LINE}" stroke-width="${w*2+4}" stroke-linecap="round" fill="none"/>` : '')
+    + `<path d="${d}" stroke="${fill}" stroke-width="${w*2}" stroke-linecap="round" fill="none"/>`;
+
+  const armTopX = b.shoulderHalf*0.84, armTopY = b.shoulderY + 26;
+  const handX   = b.shoulderHalf + 50*b.bw, handY = b.waistY + 4;   // ~22 degrees from vertical
+  const armL = `M ${CX-armTopX} ${armTopY} L ${CX-handX} ${handY}`;
+  const armR = `M ${CX+armTopX} ${armTopY} L ${CX+handX} ${handY}`;
+  const legL = `M ${CX-b.legTopX} ${b.hipY-16} L ${CX-b.legBotX} ${b.legBotY}`;
+  const legR = `M ${CX+b.legTopX} ${b.hipY-16} L ${CX+b.legBotX} ${b.legBotY}`;
+
+  const hipsD =
+    `M ${CX-b.waistHalf} ${b.waistY-12} L ${CX+b.waistHalf} ${b.waistY-12}
+     Q ${CX+b.hipHalf} ${b.waistY+4}, ${CX+b.hipHalf-5} ${b.hipY+12}
+     L ${CX-b.hipHalf+5} ${b.hipY+12}
+     Q ${CX-b.hipHalf} ${b.waistY+4}, ${CX-b.waistHalf} ${b.waistY-12} Z`;
+  const dressD =
+    `M ${CX-b.shoulderHalf} ${b.shoulderY+30}
+     Q ${CX-b.shoulderHalf} ${b.shoulderY-1}, ${CX-b.shoulderHalf+24} ${b.shoulderY-4}
+     L ${CX+b.shoulderHalf-24} ${b.shoulderY-4}
+     Q ${CX+b.shoulderHalf} ${b.shoulderY-1}, ${CX+b.shoulderHalf} ${b.shoulderY+30}
+     C ${CX+b.shoulderHalf+4} ${b.waistY-6}, ${CX+b.hipHalf+30} ${b.hipY+6}, ${CX+b.hipHalf+38} ${b.hipY+30}
+     Q ${CX} ${b.hipY+50}, ${CX-b.hipHalf-38} ${b.hipY+30}
+     C ${CX-b.hipHalf-30} ${b.hipY+6}, ${CX-b.shoulderHalf-4} ${b.waistY-6}, ${CX-b.shoulderHalf} ${b.shoulderY+30} Z`;
+  const shirtD =
+    `M ${CX-b.shoulderHalf} ${b.shoulderY+30}
+     Q ${CX-b.shoulderHalf} ${b.shoulderY-1}, ${CX-b.shoulderHalf+24} ${b.shoulderY-4}
+     L ${CX+b.shoulderHalf-24} ${b.shoulderY-4}
+     Q ${CX+b.shoulderHalf} ${b.shoulderY-1}, ${CX+b.shoulderHalf} ${b.shoulderY+30}
+     L ${CX+b.waistHalf} ${b.waistY+6} L ${CX-b.waistHalf} ${b.waistY+6} Z`;
+
+  const groundShadow = mono ? ''
+    : `<ellipse cx="${CX}" cy="${b.legBotY + b.footR*1.30}" rx="${b.legBotX + b.footR*1.45}"
+         ry="${b.footR*0.42}" fill="rgba(28,44,50,.20)" filter="url(#gs${uid})"/>`;
+
+  const body =
+      groundShadow
+    + tube(armL,b.armW,sc) + tube(armR,b.armW,sc)                 // arms, behind the torso
+    + tube(armL,b.armW,g3) + tube(armR,b.armW,g3)
+    + tube(legL,b.legW,pc) + tube(legR,b.legW,pc)                 // thighs, behind the hips
+    + tube(legL,b.legW,g3) + tube(legR,b.legW,g3)
+    + (m.body.dress ? '' : `<path d="${hipsD}" fill="${pc}" ${edge}/><path d="${hipsD}" fill="${g3}"/>`)
+    + `<path d="${m.body.dress ? dressD : shirtD}" fill="${sc}" ${edge}/>`
+    + `<path d="${m.body.dress ? dressD : shirtD}" fill="${g3}"/>`
+    + (mono ? '' : `<path d="M ${CX-30} ${b.shoulderY-2} Q ${CX} ${b.shoulderY+24} ${CX+30} ${b.shoulderY-2}"
+             fill="none" stroke="rgba(0,0,0,.15)" stroke-width="7" stroke-linecap="round"/>`)
+    + sph(CX-handX, handY, b.handR, sc) + sph(CX+handX, handY, b.handR, sc)
+    + sph(CX-b.legBotX, b.legBotY+b.footR*0.46, b.footR, shc)
+    + sph(CX+b.legBotX, b.legBotY+b.footR*0.46, b.footR, shc);
+
+  const chinY = 254 + (g.chY - 254) * m.face.size;      // chin in body space
+  const neckwear =
+      (J.choker ? `<path d="M ${CX-33} ${chinY-2} Q ${CX} ${chinY+17} ${CX+33} ${chinY-2}"
+         fill="none" stroke="${jc}" stroke-width="7" stroke-linecap="round"/>` : '')
+    + (J.necklace ? `<path d="M ${CX-39} ${chinY+1} Q ${CX} ${chinY+38} ${CX+39} ${chinY+1}"
+         fill="none" stroke="${jc}" stroke-width="3.4"/>
+       <circle cx="${CX}" cy="${chinY+40}" r="6.2" fill="${jc}"/>` : '');
+
+  const neck =
+    `<path d="M ${CX-28} ${g.chY-60} L ${CX-28} ${b.shoulderY+22} L ${CX+28} ${b.shoulderY+22} L ${CX+28} ${g.chY-60} Z" fill="${skin}"/>
+     ${mono?'':`<ellipse cx="${CX}" cy="${g.chY-8}" rx="30" ry="15" fill="rgba(0,0,0,.11)"/>`}`;
+
+  /* ---- head ---- */
+  const earX = g.cW*0.74 + g.jW*0.26 + 6, earY = g.cY + 32;
+  const ear = sx =>
+    `<g transform="translate(${CX+sx*earX},${earY}) scale(${sx},1)">
+       <ellipse rx="14" ry="21" fill="${skin}" stroke="${mono?LINE:'rgba(0,0,0,.10)'}" stroke-width="${mono?4:1.8}"/>
+       <path d="M 3 -10 C -5 -8, -6 6, 2 11" fill="none" stroke="${mono?LINE:'rgba(0,0,0,.13)'}" stroke-width="${mono?3:2.4}" stroke-linecap="round"/>
+     </g>`;
+  const ears = ear(-1) + ear(1);
+
+  const face = mono
+    ? `<path d="${fp}" fill="${inv?'none':'#fff'}" stroke="${LINE}" stroke-width="4.5"/>`
+    : `<path d="${fp}" fill="${skin}"/>
+       <path d="${fp}" fill="url(#sh${uid})"/>`;
+
+  const brows = pair(BROWS[m.brows.style].d(bwc), browY, browSp, m.brows.size, m.brows.size, m.brows.rot);
+  const eyes  = pair(EYES[m.eyes.style].d(ec), eyeY, eyeSp, m.eyes.size, m.eyes.size*m.eyes.stretch, m.eyes.rot);
+  const nw = m.nose.width;
+  const nose  = `<g transform="translate(${noseX},${noseY}) scale(${m.nose.size*nw},${m.nose.size})">`
+              + NOSES[m.nose.style].d(4 / Math.sqrt(nw)) + `</g>`;   // keep the line weight even when stretched
+  const mouth = `<g transform="translate(${mouthX},${mouthY}) scale(${m.mouth.size*m.mouth.stretch},${m.mouth.size})">${MOUTHS[m.mouth.style].d(mc)}</g>`;
+  const stache= must.d ? `<g transform="translate(${mouthX},${mustY}) scale(${m.beard.size})">${must.d(fhc)}</g>` : '';
+
+  const bg = Object.assign({}, g, {mouthY, mouthX, noseY, noseX, earY, fp});
+  const beardClip = beard.clip ? `<g clip-path="url(#fc${uid})">${beard.clip(fhc,bg,skin)}</g>` : '';
+  const beardFree = beard.free ? beard.free(fhc,bg,skin) : '';
+
+  const NOGLOSS = new Set(['Bald','Mohawk','Slick','Side Part','Afro Puffs','Loose Curls','Tapered']);
+  const gloss = NOGLOSS.has(hair.n) ? ''
+    : `<path d="M 192 157 C 218 130, 266 123, 303 139" fill="none" stroke="${shade(hc,.13)}"
+         stroke-width="10" stroke-linecap="round" opacity=".8"/>`;
+  /* Hair art was drawn against a reference skull: 106 half-width at the cheeks,
+     88 at the crown control. Fit to whichever of those the live skull stretches
+     more, and anchor the scale near the crown so shrinking cannot expose it. */
+  const HAIR_ANCHOR = 138;
+  const fit    = Math.max(g.cW / 106, g.tW / 88);
+  const hairSX = fit * 1.04 * (0.62 + 0.38 * m.hair.size);   // width tracks the skull; Size mostly adds volume
+  const hairSY = m.hair.size * Math.max(1, fit * 0.88);
+  const hairT  = `translate(${CX},${HAIR_ANCHOR+m.hair.y}) scale(${m.hair.flip?-hairSX:hairSX},${hairSY}) translate(${-CX},${-HAIR_ANCHOR})`;
+  const hairBack  = hair.back  ? `<g transform="${hairT}">${hair.back(hc)}</g>`  : '';
+  const hairFront = hair.front ? `<g transform="${hairT}">${hair.front(hc)}${gloss}</g>` : '';
+
+  const onEar = (sx, d) => `<g transform="translate(${CX+sx*earX},${earY}) scale(${sx},1)">${d}</g>`;
+  const earJewel =
+      (J.cartL ? onEar(-1, JEWEL_EAR.cart(jc)) : '') + (J.cartR ? onEar(1, JEWEL_EAR.cart(jc)) : '')
+    + (J.studL ? onEar(-1, JEWEL_EAR.stud(jc)) : '') + (J.studR ? onEar(1, JEWEL_EAR.stud(jc)) : '')
+    + (J.dropL ? onEar(-1, JEWEL_EAR.drop(jc)) : '') + (J.dropR ? onEar(1, JEWEL_EAR.drop(jc)) : '');
+
+  const hatSpec = HATS[m.hat.style];
+  const hatT = `translate(${CX},${HAIR_ANCHOR}) scale(${fit*1.04},${Math.max(1, fit*0.88)}) translate(${-CX},${-HAIR_ANCHOR})`;
+  const hatC = mono ? (inv ? 'none' : '#fff') : pick(HATC, m.hat.color);
+  const hatA = mono ? (inv ? 'none' : '#fff') : shade(pick(HATC, m.hat.color), -.17);
+  const hat = hatSpec.d
+    ? `<g transform="${hatT}" ${mono ? `stroke="${LINE}" stroke-width="4" stroke-linejoin="round"` : ''}>`
+      + hatSpec.d(hatC, hatA) + `</g>` : '';
+
+  const glass = GLASSES[m.glasses.style].d
+    ? `<g transform="translate(${CX},${eyeY+m.glasses.y}) scale(${m.glasses.size})">${GLASSES[m.glasses.style].d(gc)}</g>` : '';
+  const mole = m.mole.on
+    ? `<ellipse cx="${mouthX+40+m.mole.x}" cy="${mouthY-22+m.mole.y}" rx="${5*m.mole.size}" ry="${5*m.mole.size}" fill="#5a4030"/>` : '';
+
+  const headScale = t =>
+    `<g transform="translate(${CX},254) scale(${m.face.size}) translate(${-CX},-254)">${t}</g>`;
+  /* The 24 hand-drawn caps cannot each fit 12 skull shapes at every size, so the
+     crown of the skull is filled in hair colour underneath. Clipped above the
+     style's hairline, it is invisible except where a cap would have fallen short. */
+  const scalpOn = !!hair.front && hair.n !== 'Mohawk';
+  const scalpY  = hair.hl != null ? hair.hl : 180;
+  const scalpCY = (g.tY + g.chY) / 2;
+  const scalp = scalpOn
+    ? `<g clip-path="url(#cp${uid})"><path d="${fp}" fill="${hc}"
+         transform="translate(${CX},${scalpCY}) scale(1.03) translate(${-CX},${-scalpCY})"/></g>`
+    : '';
+  const backHair = hairBack ? headScale(hairBack) : '';
+  const head = headScale(
+      ears + face + scalp + beardClip + beardFree +
+      brows + eyes + nose + mouth + stache +
+      hairFront + earJewel + hat + glass + mole);
+
+  const out = `<defs>
+<linearGradient id="sh${uid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#fff" stop-opacity=".16"/>
+        <stop offset="62%"  stop-color="#fff" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000" stop-opacity=".055"/>
+      </linearGradient>
+      <linearGradient id="b3${uid}" gradientUnits="userSpaceOnUse" x1="${CX-165}" y1="0" x2="${CX+175}" y2="0">
+        <stop offset="0%"   stop-color="#fff" stop-opacity=".13"/>
+        <stop offset="34%"  stop-color="#fff" stop-opacity=".07"/>
+        <stop offset="64%"  stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000" stop-opacity=".11"/>
+      </linearGradient>
+      <radialGradient id="sp${uid}" cx="35%" cy="30%" r="82%">
+        <stop offset="0%"   stop-color="#fff" stop-opacity=".2"/>
+        <stop offset="58%"  stop-color="#fff" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000" stop-opacity=".1"/>
+      </radialGradient>
+      <filter id="gs${uid}" x="-60%" y="-180%" width="220%" height="460%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <clipPath id="fc${uid}"><path d="${fp}"/></clipPath>
+      <clipPath id="cp${uid}"><path d="M 0 0 H 512 V 254
+        C 340 254, 300 ${scalpY} 256 ${scalpY}
+        C 212 ${scalpY}, 172 254, 0 254 Z"/></clipPath>
+    </defs>${backHair}${neck}${body}${neckwear}${head}`;
+  LINE = INK_BASE;                              // never leak the mono ink into the live Mii
+  // only the parts library's own hard-coded paper white (sclera, teeth) is knocked out
+  return inv ? out.replace(/fill="#fff(?:fff)?"(?![0-9a-f])/gi, 'fill="none"') : out;
+}
+
+/* ============================================================
+   TAB / PANEL CONFIG
+   ============================================================ */
+const ic  = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+  stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const fig = d => `<svg viewBox="0 0 24 24" fill="currentColor">${d}</svg>`;
+const IC = {
+  info:  ic('<path d="M20.5 4.5h-17v12h5l3.2 3.6 3.2-3.6h5.6z"/>'
+           + '<circle cx="9.4" cy="10.2" r="1.15" fill="currentColor" stroke="none"/>'
+           + '<circle cx="14.6" cy="10.2" r="1.15" fill="currentColor" stroke="none"/>'
+           + '<path d="M9.3 13.2c1.5 1.3 4 1.3 5.4 0"/>'),
+  face:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <g fill="currentColor" stroke="none"><circle cx="9.2" cy="10.4" r="1.15"/><circle cx="14.8" cy="10.4" r="1.15"/></g>
+           <path d="M8.6 14.9c1.6 1.8 5.2 1.8 6.8 0"/></svg>`,
+  hair:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <path fill="currentColor" stroke="none"
+                 d="M12 2.9c-4.5 0-8.2 4.1-8.2 9.1 0 .4 0 .8.1 1.2.6-2.9 3.3-4.4 8.1-4.4s7.5 1.5 8.1 4.4c.1-.4.1-.8.1-1.2 0-5-3.7-9.1-8.2-9.1z"/></svg>`,
+  brows: ic('<path d="M2.5 13c2-3.2 6-3.2 8 0M13.5 13c2-3.2 6-3.2 8 0"/>'),
+  eyes:  ic('<ellipse cx="7" cy="12" rx="4.2" ry="3.2"/><ellipse cx="17" cy="12" rx="4.2" ry="3.2"/><circle cx="7" cy="12" r="1.2" fill="currentColor"/><circle cx="17" cy="12" r="1.2" fill="currentColor"/>'),
+  nose:  ic('<path d="M12 4c0 4.5-3 7.5-3 10.5a3 3 0 006 0"/>'),
+  mouth: ic('<path d="M4.5 10.5c2.5 6.5 12.5 6.5 15 0"/>'),
+  /* combined: moustache above a full beard */
+  beard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <g fill="currentColor" stroke="none">
+             <path d="M12 11.2c1.6-1.9 5.5-1.8 5.5 1.05 0 1.85-3.1 2.35-5.5-.2-2.4 2.55-5.5 2.05-5.5.2 0-2.85 3.9-2.95 5.5-1.05z"/>
+             <path fill-rule="evenodd" d="M4.9 13.1C5.4 17.9 8.4 21.2 12 21.2
+               C15.6 21.2 18.6 17.9 19.1 13.1 C17.6 15.6 15.1 16.6 12 16.6
+               C8.9 16.6 6.4 15.6 4.9 13.1 Z
+               M9.6 18.4 a2.4 1.1 0 1 0 4.8 0 a2.4 1.1 0 1 0 -4.8 0 Z"/>
+           </g></svg>`,
+  /* full beard, the iconic one */
+  beardFull: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <path fill="currentColor" stroke="none" fill-rule="evenodd"
+                 d="M4.1 9.7 C4.0 15.7 7.5 21.2 12 21.2 C16.5 21.2 20.0 15.7 19.9 9.7
+                    C19.3 13.5 16.1 15.0 12 15.0 C7.9 15.0 4.7 13.5 4.1 9.7 Z
+                    M9.2 17.3 a2.8 1.2 0 1 0 5.6 0 a2.8 1.2 0 1 0 -5.6 0 Z"/></svg>`,
+  /* moustache, sat on the face rather than floating */
+  stacheFace: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <path d="M9.4 17c1.3 1.1 3.9 1.1 5.2 0"/>
+           <path fill="currentColor" stroke="none"
+                 d="M12 12c1.6-1.9 5.6-1.8 5.6 1.05 0 1.9-3.15 2.4-5.6-.2-2.45 2.6-5.6 2.1-5.6.2C6.4 10.2 10.4 10.1 12 12z"/></svg>`,
+  glass: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <g fill="currentColor" stroke="none">
+             <path d="M12 2.4c-3.5 0-6 2.3-6 5.8v1.7h12V8.2c0-3.5-2.5-5.8-6-5.8z"/>
+             <rect x="2.6" y="10.4" width="18.8" height="2.7" rx="1.35"/>
+           </g>
+           <circle cx="7.1" cy="18" r="3.3"/><circle cx="16.9" cy="18" r="3.3"/>
+           <path d="M10.4 17.6h3.2"/></svg>`,
+  earring: ic('<circle cx="12" cy="5.6" r="2.1" fill="currentColor" stroke="none"/>'
+           + '<circle cx="12" cy="14.6" r="5.6"/>'),
+  hat:   fig('<path d="M12 3c-3.7 0-6.4 2.5-6.4 6.3v2.6h12.8V9.3C18.4 5.5 15.7 3 12 3z"/>'
+           + '<rect x="2.4" y="12.6" width="19.2" height="3.1" rx="1.55"/>'),
+  glassOnly: ic('<circle cx="6.7" cy="13.5" r="4.3"/><circle cx="17.3" cy="13.5" r="4.3"/>'
+           + '<path d="M11 13h2M2.4 10.8L4.6 8.8M21.6 10.8L19.4 8.8"/>'),
+  body:  fig('<circle cx="12" cy="4.4" r="3.3"/>'
+           + '<rect x="8.5" y="8.6" width="7" height="7.6" rx="2.6"/>'
+           + '<rect x="9.1" y="15.8" width="2.6" height="4.8" rx="1.3"/>'
+           + '<rect x="12.3" y="15.8" width="2.6" height="4.8" rx="1.3"/>')
+};
+
+const TABS = [
+ {id:'profile', label:'Mii Info', icon:IC.info, view:'56 34 400 700', sections:[{t:'profile'}]},
+ {id:'body', label:'Body', icon:IC.body, view:'56 34 400 700', sections:[
+   {t:'sliders', big:true, items:[['body.build','Build — narrow to wide',.78,1.28,.005,'pct']]},
+   {t:'sliders', big:true, items:[['body.height','Height — short to tall',.8,1.2,.005,'pct']]}
+ ]},
+ {id:'face', label:'Face', icon:IC.face, view:'116 84 280 348', sections:[
+   {t:'grid',   title:'Face Shape', path:'face.shape', items:FACES},
+   {t:'colors', title:'Skin Tone',  path:'skin', list:SKINS},
+   {t:'sliders',title:'Proportions', items:[
+     ['face.size','Overall Size',.86,1.14,.005,'pct'],
+     ['face.width','Width',.86,1.16,.005,'pct'],
+     ['face.jaw','Jaw Width',.82,1.2,.005,'pct']]}
+ ]},
+ {id:'hair', label:'Hair', icon:IC.hair, view:'70 30 372 448', sections:[
+   {t:'grid',   title:'Hair Style', path:'hair.style', items:HAIRS},
+   {t:'colors', title:'Hair Colour', path:'hair.color', list:HAIRC},
+   {t:'sliders',title:'Adjust', items:[
+     ['hair.size','Size',.9,1.12,.005,'pct'],
+     ['hair.y','Vertical',-16,16,.5,'num']]},
+   {t:'toggles', items:[['hair.flip','Flip Parting']]}
+ ]},
+ {id:'brows', label:'Eyebrows', short:'Brows', icon:IC.brows, view:'146 174 220 96', sections:[
+   {t:'grid',   title:'Eyebrow Style', path:'brows.style', items:BROWS},
+   {t:'colors', title:'Colour', path:'brows.color', list:HAIRC},
+   {t:'sliders',title:'Adjust', items:[
+     ['brows.size','Size',.7,1.35,.005,'pct'],
+     ['brows.spacing','Spacing (In/Out)',-14,24,.5,'num'],
+     ['brows.y','Vertical (Up/Down)',-24,26,.5,'num'],
+     ['brows.rot','Tilt',-25,25,1,'deg']]}
+ ]},
+ {id:'eyes', label:'Eyes', icon:IC.eyes, view:'142 210 228 108', sections:[
+   {t:'grid',   title:'Eye Style', path:'eyes.style', items:EYES},
+   {t:'colors', title:'Eye Colour', path:'eyes.color', list:EYEC},
+   {t:'sliders',title:'Adjust', items:[
+     ['eyes.size','Size',.72,1.3,.005,'pct'],
+     ['eyes.stretch','Stretch',.7,1.35,.005,'pct'],
+     ['eyes.spacing','Spacing (In/Out)',-12,26,.5,'num'],
+     ['eyes.y','Vertical (Up/Down)',-26,28,.5,'num'],
+     ['eyes.rot','Rotation',-22,22,1,'deg']]}
+ ]},
+ {id:'nose', label:'Nose', icon:IC.nose, view:'190 248 132 100', sections:[
+   {t:'grid',   title:'Nose Style', path:'nose.style', items:NOSES},
+   {t:'sliders',title:'Adjust', items:[
+     ['nose.size','Size',.7,1.45,.005,'pct'],
+     ['nose.width','Width',.68,1.45,.005,'pct'],
+     ['nose.x','Horizontal',-32,32,.5,'num'],
+     ['nose.y','Vertical',-26,30,.5,'num']]}
+ ]},
+ {id:'mouth', label:'Mouth', icon:IC.mouth, view:'178 294 156 100', sections:[
+   {t:'grid',   title:'Mouth Style', path:'mouth.style', items:MOUTHS},
+   {t:'colors', title:'Lip / Inner Colour', path:'mouth.color', list:MOUTHC},
+   {t:'sliders',title:'Adjust', items:[
+     ['mouth.size','Size',.7,1.35,.005,'pct'],
+     ['mouth.stretch','Stretch',.7,1.4,.005,'pct'],
+     ['mouth.x','Horizontal',-34,34,.5,'num'],
+     ['mouth.y','Vertical',-28,32,.5,'num']]}
+ ]},
+ {id:'beard', label:'Facial Hair', short:'Beard', icon:IC.beard, view:'138 246 236 216', sections:[
+   {t:'grid',   title:'Moustache', path:'beard.must', items:MUSTACHES, view:'180 288 152 96'},
+   {t:'grid',   title:'Beard',     path:'beard.style', items:BEARDS},
+   {t:'colors', title:'Colour', path:'beard.color', list:HAIRC},
+   {t:'sliders', when:(m,sub)=>sub===0, items:[
+     ['beard.size','Moustache Size',.7,1.35,.005,'pct'],
+     ['beard.y','Moustache Height',-18,18,.5,'num']]}
+ ]},
+ {id:'glasses', label:'Accessories', short:'Extras', icon:IC.glass, view:'126 196 260 136', sections:[
+   {t:'grid',   title:'Glasses', path:'glasses.style', items:GLASSES},
+   {t:'grid',   title:'Hats',    path:'hat.style', items:HATS, view:'86 10 340 320'},
+   {t:'multi',  title:'Jewellery', icon:IC.earring, view:'128 206 256 168', items:[
+     {n:'Cartilage (left)',  path:'jewel.cartL'},
+     {n:'Cartilage (right)', path:'jewel.cartR'},
+     {n:'Stud (left)',       path:'jewel.studL'},
+     {n:'Stud (right)',      path:'jewel.studR'},
+     {n:'Drop (left)',       path:'jewel.dropL'},
+     {n:'Drop (right)',      path:'jewel.dropR'},
+     {n:'Pendant necklace',  path:'jewel.necklace', view:'148 336 216 146'},
+     {n:'Choker',            path:'jewel.choker',   view:'148 336 216 146'}]},
+   {t:'colors', title:'Frame Colour', path:'glasses.color', list:GLASSC, when:(m,sub)=>sub===0},
+   {t:'colors', title:'Hat Colour',   path:'hat.color', list:HATC, when:(m,sub)=>sub===1},
+   {t:'colors', title:'Jewellery Colour', path:'jewel.color', list:JEWELC, when:(m,sub)=>sub===2},
+   {t:'sliders', when:(m,sub)=>sub===0, items:[
+     ['glasses.size','Size',.75,1.25,.005,'pct'],
+     ['glasses.y','Vertical',-22,24,.5,'num']]},
+   {t:'toggles', items:[['mole.on','Beauty Mark']]},
+   {t:'sliders', title:'Beauty Mark', when:m=>m.mole.on, items:[
+     ['mole.size','Size',.6,1.8,.01,'pct'],
+     ['mole.x','Horizontal',-130,52,1,'num'],
+     ['mole.y','Vertical',-70,60,1,'num']]}
+ ]},
+ 
+];
+
+/* ============================================================
+   UI  —  icons only, no text labels (Wii Mii Channel style)
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const svgEl = $('#mii'), panelEl = $('#panel'), tabsEl = $('#tabs');
+let active = 0, sub = 0, page = 0;
+const PER_PAGE = 6;
+
+const chev = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+  stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const si  = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+  stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const SI = {
+  small : si('<circle cx="12" cy="12" r="3.2"/>'),
+  big   : si('<circle cx="12" cy="12" r="8"/>'),
+  narrow: si('<path d="M9 4v16M15 4v16"/>'),
+  wide  : si('<path d="M4 4v16M20 4v16"/>'),
+  squat : si('<path d="M4 14h16M4 19h16"/>'),
+  tall  : si('<path d="M4 5h16M4 19h16"/>'),
+  left  : si('<path d="M14 5l-7 7 7 7"/>'),
+  right : si('<path d="M10 5l7 7-7 7"/>'),
+  up    : si('<path d="M5 14l7-7 7 7"/>'),
+  down  : si('<path d="M5 10l7 7 7-7"/>'),
+  in    : si('<path d="M3 12h6M6 9l3 3-3 3M21 12h-6M18 9l-3 3 3 3"/>'),
+  out   : si('<path d="M9 12H3M6 9l-3 3 3 3M15 12h6M18 9l3 3-3 3"/>'),
+  rotL  : si('<path d="M4.5 11a8 8 0 1 1 1 6"/><path d="M3 6v5h5"/>'),
+  rotR  : si('<path d="M19.5 11a8 8 0 1 0-1 6"/><path d="M21 6v5h-5"/>'),
+  flat  : si('<path d="M4 9h16M4 15h16"/>'),
+  stretch:si('<path d="M4 4h16M4 20h16"/>'),
+  dice  : si('<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>'),
+  undo  : si('<path d="M3.5 10.5h9.5a5 5 0 0 1 0 10H8"/><path d="M3.5 10.5l4-4M3.5 10.5l4 4"/>'),
+  save  : si('<path d="M12 3.5v10.5"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v3h15v-3"/>'),
+  flip  : si('<path d="M12 3v18"/><path d="M8.5 7.5L4.5 12l4 4.5"/><path d="M15.5 7.5l4 4.5-4 4.5"/>'),
+  mark  : si('<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="7.5" opacity=".45"/>'),
+  shirt : si('<path d="M8.5 4.5L12 6.5l3.5-2 4.5 3-2 3v9H6v-9L4 7.5z"/>'),
+  pants : si('<path d="M6.5 4h11l-1 16h-3.6L12 11l-.9 9H7.5z"/>'),
+  shoe  : si('<path d="M3 16.5V9.5h4l3 3h6.5a3.5 3.5 0 0 1 3.5 3.5v.5z"/>'),
+  noseNarrow: fig('<path d="M12 4.6c-.9 2.7-2.7 6-2.7 8.5 0 2.2 1.2 3.5 2.7 3.5s2.7-1.3 2.7-3.5c0-2.5-1.8-5.8-2.7-8.5z"/>'),
+  noseWide  : fig('<path d="M12 4.6c-1.9 2.7-5.4 6-5.4 8.5 0 2.2 2.4 3.5 5.4 3.5s5.4-1.3 5.4-3.5c0-2.5-3.5-5.8-5.4-8.5z"/>'),
+  browNarrow: fig('<path d="M12 3.2C9.7 3.2 8.2 4.9 7.9 7.3 7.5 10 6.8 12 6.8 13.8 6.8 17.5 9.1 20.6 12 20.6'
+              + ' 14.9 20.6 17.2 17.5 17.2 13.8 17.2 12 16.5 10 16.1 7.3 15.8 4.9 14.3 3.2 12 3.2Z"/>'),
+  browWide  : fig('<path d="M12 2.9C8.5 2.9 5.9 4.9 5.6 7.9 5.3 10.3 5.2 12.1 5.2 13.8 5.2 17.5 8.2 20.6 12 20.6'
+              + ' 15.8 20.6 18.8 17.5 18.8 13.8 18.8 12.1 18.7 10.3 18.4 7.9 18.1 4.9 15.5 2.9 12 2.9Z"/>'),
+  jawNarrow : fig('<path d="M12 3C8.2 3 5.4 5.6 5.4 9.6 5.4 12 6 14 7.2 16.2 8.6 18.8 10.4 21.2 12 21.2'
+              + ' 13.6 21.2 15.4 18.8 16.8 16.2 18 14 18.6 12 18.6 9.6 18.6 5.6 15.8 3 12 3Z"/>'),
+  jawWide   : fig('<path d="M12 3.2C8.4 3.2 5.8 5.8 5.8 9.6 5.8 12 5.6 14.6 6 16.6 6.5 19.2 8.9 20.8 12 20.8'
+              + ' 15.1 20.8 17.5 19.2 18 16.6 18.4 14.6 18.2 12 18.2 9.6 18.2 5.8 15.6 3.2 12 3.2Z"/>'),
+  figThin : fig('<circle cx="12" cy="4.4" r="3.1"/><rect x="10" y="8.2" width="4" height="7.4" rx="1.6"/><rect x="9.9" y="15.2" width="1.9" height="5" rx=".95"/><rect x="12.2" y="15.2" width="1.9" height="5" rx=".95"/>'),
+  figWide : fig('<circle cx="12" cy="4.2" r="3.6"/><rect x="6.4" y="8.4" width="11.2" height="7.2" rx="2.4"/><rect x="8" y="15.2" width="2.7" height="5" rx="1.35"/><rect x="13.3" y="15.2" width="2.7" height="5" rx="1.35"/>'),
+  figShort: fig('<circle cx="12" cy="7.6" r="3.2"/><rect x="9.4" y="11.4" width="5.2" height="5.4" rx="1.8"/><rect x="9.6" y="16.4" width="2" height="3.4" rx="1"/><rect x="12.4" y="16.4" width="2" height="3.4" rx="1"/>'),
+  figTall : fig('<circle cx="12" cy="3.2" r="2.9"/><rect x="9.5" y="6.6" width="5" height="6.6" rx="1.8"/><rect x="9.7" y="12.8" width="2" height="7.6" rx="1"/><rect x="12.3" y="12.8" width="2" height="7.6" rx="1"/>'),
+  dress : si('<path d="M9.3 3.5h5.4l1.4 3.2-1.2 2 4.1 11.8H5l4.1-11.8-1.2-2z"/>'),
+  star  : si('<path d="M12 3.6l2.6 5.4 5.9.85-4.25 4.15 1 5.9L12 17.05 6.75 19.9l1-5.9L3.5 9.85l5.9-.85z" fill="currentColor"/>'),
+  stache: si('<path d="M12 9.5c2.6-2.8 8.5-2.6 8.5 1.8 0 2.8-4.8 3.6-8.5-.4-3.7 4-8.5 3.2-8.5.4C3.5 6.9 9.4 6.7 12 9.5z"/>')
+};
+
+/* slider end-caps are derived from what the slider actually does */
+function caps(path){
+  if(path === 'body.build')  return [SI.figThin, SI.figWide];
+  if(path === 'body.height') return [SI.figShort, SI.figTall];
+  if(path === 'face.width')  return [SI.browNarrow, SI.browWide];   // skull width at the brow
+  if(path === 'face.jaw')    return [SI.jawNarrow, SI.jawWide];
+  if(path === 'nose.width')  return [SI.noseNarrow, SI.noseWide];
+  const k = path.split('.').pop();
+  if(k==='size')                       return [SI.small, SI.big];
+  if(k==='width'||k==='jaw'||k==='build') return [SI.narrow, SI.wide];
+  if(k==='height')                     return [SI.squat, SI.tall];
+  if(k==='x')                          return [SI.left, SI.right];
+  if(k==='y')                          return [SI.up, SI.down];
+  if(k==='spacing')                    return [SI.in, SI.out];
+  if(k==='rot')                        return [SI.rotL, SI.rotR];
+  if(k==='stretch')                    return [SI.flat, SI.stretch];
+  return [SI.small, SI.big];
+}
+/* which icon captions a colour box or a sub-category switch */
+const SEC_IC = {
+  'skin':IC.face, 'hair.color':IC.hair, 'brows.color':IC.brows, 'eyes.color':IC.eyes,
+  'mouth.color':IC.mouth, 'beard.color':IC.beard, 'glasses.color':IC.glass,
+  'body.color':SI.shirt, 'body.pants':SI.pants, 'body.shoes':SI.shoe,
+  'beard.must':IC.stacheFace, 'beard.style':IC.beardFull,
+  'glasses.style':IC.glassOnly, 'glasses.color':IC.glassOnly, 'hat.style':IC.hat, 'hat.color':IC.hat,
+  'jewel.color':IC.earring
+};
+const TOG_IC = {'hair.flip':SI.flip, 'mole.on':SI.mark, 'body.dress':SI.dress};
+
+function thumb(path, idx, view, selected){
+  const t = structuredClone(M);
+  set(t, path, idx);
+  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1)}</svg>`;
+}
+
+const esc = v => String(v==null?'':v).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const opts = (n, sel) => Array.from({length:n}, (_,i)=>
+  `<option value="${i+1}"${i+1===sel?' selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('');
+
+function profileHTML(){
+  return `<div class="profile">
+    <div class="pf s5"><span class="lab">Nickname</span>
+      <input class="field" id="pfName" maxlength="16" value="${esc(M.name)}" aria-label="Nickname"></div>
+
+    <div class="pf s1"><span class="lab">Favorite?</span>
+      <button class="field fav-btn${M.favorite?' on':''}" data-pf="favorite"
+        aria-pressed="${M.favorite}" aria-label="Favorite"><span class="star">${SI.star}</span></button></div>
+
+    <div class="pf s3"><span class="lab">Outfit</span>
+      <button class="field" data-pf="outfit" aria-pressed="${M.body.dress}"
+        aria-label="Outfit">${M.body.dress ? 'Dress' : 'Pants'}</button></div>
+
+    <div class="pf s3"><span class="lab">Birthday</span>
+      <div class="bday">
+        <select class="field" data-pf="bm" aria-label="Birth month">${opts(12, M.birthday.m)}</select>
+        <span class="slash">/</span>
+        <select class="field" data-pf="bd" aria-label="Birth day">${opts(31, M.birthday.d)}</select>
+      </div></div>
+
+    <div class="pf s3"><span class="lab">Favorite Color</span>
+      <div class="favgrid">${SHIRTC.map((c,i)=>
+        `<button class="fav${i===M.body.color?' on':''}" data-set="body.color" data-val="${i}"
+           style="background:${c}" aria-label="Favourite colour ${i+1}"></button>`).join('')}</div></div>
+
+    <div class="pf s3 pf--fill"><span class="lab">Mingle</span>
+      <button class="field" data-pf="mingle" aria-pressed="${M.mingle}" aria-label="Mingle">${M.mingle?'On':'Off'}</button></div>
+
+    <div class="pf s6"><span class="lab">Creator</span>
+      <input class="field" id="pfCreator" maxlength="16" value="${esc(M.creator)}" aria-label="Mii creator"></div>
+  </div>`;
+}
+
+function activeGrids(){
+  return TABS[active].sections.filter(x =>
+    (x.t === 'grid' || x.t === 'multi') && (!x.when || x.when(M, sub)));
+}
+function syncPage(){
+  const gs = activeGrids()[sub];
+  page = (gs && gs.t === 'grid') ? Math.floor(get(M, gs.path) / PER_PAGE) : 0;
+}
+
+/* Preview a single piece with the rest cleared, so each tile reads on its own. */
+function jewelThumb(path, view, selected){
+  const t = structuredClone(M);
+  JEWEL_KEYS.forEach(k => t.jewel[k] = false);
+  set(t, path, true);
+  t.hair.style = 0;                 // bare head, or hair hides the ears in the tile
+  t.hat.style  = 0;
+  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1)}</svg>`;
+}
+
+function drawTabs(){
+  tabsEl.innerHTML = TABS.map((t,i)=>
+    `<button class="tab ${i===active?'on':''}" data-tab="${i}" title="${t.label}"
+       aria-label="${t.label}" aria-pressed="${i===active}">${t.icon}</button>`).join('');
+}
+
+function drawPanel(){
+  const tab = TABS[active];
+  if(tab.sections[0] && tab.sections[0].t === 'profile'){
+    panelEl.innerHTML = `<div class="tray tray--full"><div class="tray-main">${profileHTML()}</div></div>`;
+    return;
+  }
+  const grids = activeGrids();
+  if(sub >= grids.length) sub = 0;
+  let main = '', side = '';   // main = option picker (left); side = colours + sliders (right)
+
+  if(grids.length > 1)
+    main += `<div class="subs">` + grids.map((gs,i)=>
+      `<button class="sub${i===sub?' on':''}" data-sub="${i}" title="${gs.title}"
+         aria-label="${gs.title}">${gs.icon || SEC_IC[gs.path] || SI.small}</button>`).join('') + `</div>`;
+
+  const gs = grids[sub];
+  if(gs){
+    const multi = gs.t === 'multi';
+    const cur   = multi ? null : get(M, gs.path);
+    const pages = Math.ceil(gs.items.length / PER_PAGE);
+    if(page >= pages) page = 0;
+    const start = page * PER_PAGE;
+    main += `<div class="box"><div class="pager">`
+      + `<button class="pg" data-page="-1" aria-label="Previous options">${chev('<path d="M15 4l-8 8 8 8"/>')}</button>`
+      + `<div class="grid">`
+      + gs.items.slice(start, start + PER_PAGE).map((it,k)=>{
+          const i = start + k;
+          if(multi){
+            const on = !!get(M, it.path);
+            return `<button class="tile${on?' on':''}" data-toggle="${it.path}" aria-pressed="${on}"
+              title="${it.n}" aria-label="${it.n}">${jewelThumb(it.path, it.view || gs.view || tab.view, on)}</button>`;
+          }
+          return `<button class="tile${i===cur?' on':''}" data-set="${gs.path}" data-val="${i}"
+            title="${it.n}" aria-label="${it.n}">${thumb(gs.path, i, gs.view || tab.view, i===cur)}</button>`;
+        }).join('')
+      + `</div>`
+      + `<button class="pg" data-page="1" aria-label="Next options">${chev('<path d="M9 4l8 8-8 8"/>')}</button>`
+      + `</div>`
+      + `<div class="dots">` + Array.from({length: pages}, (_,d)=>
+          `<span class="dot${d===page?' on':''}"></span>`).join('') + `</div></div>`;
+  }
+
+  for(const sec of tab.sections){
+    if(sec.when && !sec.when(M, sub)) continue;
+
+    if(sec.t === 'sliders'){
+      side += `<div class="sliders${sec.big ? ' big' : ''}">` + sec.items.map(([path,label,min,max,step])=>{
+        const v = get(M, path), pct = ((v-min)/(max-min)*100).toFixed(1), [l,r] = caps(path);
+        return `<div class="slider" title="${label}">
+            <span class="cap">${l}</span>
+            <input type="range" min="${min}" max="${max}" step="${step}" value="${v}"
+                   data-range="${path}" aria-label="${label}" style="--p:${pct}%">
+            <span class="cap">${r}</span>
+          </div>`;
+      }).join('') + `</div>`;
+    }
+
+    if(sec.t === 'toggles'){
+      side += `<div class="toggles">` + sec.items.map(([path,label])=>
+        `<button class="toggle${get(M,path)?' on':''}" data-toggle="${path}"
+           title="${label}" aria-label="${label}">${TOG_IC[path] || SI.mark}</button>`).join('')
+        + `</div>`;
+    }
+
+    if(sec.t === 'colors'){
+      const cur = get(M, sec.path);
+      const custom = typeof cur === 'string';
+      side += `<div class="swatches">`
+           +  sec.list.map((c,i)=>
+                `<button class="sw${!custom && i===cur ? ' on' : ''}" data-set="${sec.path}" data-val="${i}"
+                   style="background:${c}" title="${sec.title}" aria-label="${sec.title} ${i+1}"></button>`).join('')
+           +  `<label class="sw wheel${custom ? ' on' : ''}" title="${sec.title} — custom colour">
+                 <input type="color" data-wheel="${sec.path}" value="${custom ? cur : pick(sec.list, cur)}"
+                        aria-label="${sec.title} colour picker"></label>`
+           +  `</div>`;
+    }
+  }
+
+  panelEl.innerHTML = `<div class="tray${main ? '' : ' tray--full'}">`
+    + (main ? `<div class="tray-main">${main}</div>` : '')
+    + (side ? `<aside class="tray-side"><div class="box side-stack">${side}</div></aside>` : '')
+    + `</div>`;
+}
+
+/* ---------- framing follows the tab: head for face parts, body for the rest ---------- */
+const HEAD_TABS = new Set(['face','hair','brows','eyes','nose','mouth']);
+const HEAD_VB = [80, 64, 352, 414];
+const targetVB = () => HEAD_TABS.has(TABS[active].id)
+  ? HEAD_VB.slice()
+  : [56, 34, 400, bodyGeom(M).bottom - 34];
+const applyVB = v => svgEl.setAttribute('viewBox', v.map(n=>Math.round(n*100)/100).join(' '));
+
+let vbCur = null, vbRAF = 0, vbAnimating = false;
+function zoomTo(animate){
+  const to = targetVB();
+  if(!animate || !vbCur){ vbCur = to; vbAnimating = false; applyVB(vbCur); return; }
+  cancelAnimationFrame(vbRAF);
+  const from = vbCur.slice(), t0 = performance.now(), DUR = 300;
+  vbAnimating = true;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / DUR);
+    const e = k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+    vbCur = from.map((v,i) => v + (to[i]-v) * e);
+    applyVB(vbCur);
+    if(k < 1) vbRAF = requestAnimationFrame(step); else vbAnimating = false;
+  };
+  vbRAF = requestAnimationFrame(step);
+}
+
+function draw(){
+  uidN = 0;
+  svgEl.innerHTML = svgMii(M);
+  if(!vbAnimating) zoomTo(false);
+  persist();
+}
+function drawAll(){ drawTabs(); drawPanel(); draw(); }
+
+/* ---------- events ---------- */
+tabsEl.addEventListener('click', e=>{
+  const b = e.target.closest('[data-tab]'); if(!b) return;
+  if(+b.dataset.tab === active) return;
+  active = +b.dataset.tab; sub = 0; syncPage(); drawTabs(); drawPanel(); zoomTo(true);
+});
+
+panelEl.addEventListener('click', e=>{
+  const sw = e.target.closest('[data-sub]');
+  if(sw){ sub = +sw.dataset.sub; syncPage(); drawPanel(); return; }
+  const pg = e.target.closest('[data-page]');
+  if(pg){
+    const gs = activeGrids()[sub]; if(!gs) return;
+    const pages = Math.ceil(gs.items.length / PER_PAGE);
+    page = (page + (+pg.dataset.page) + pages) % pages;
+    drawPanel(); return;
+  }
+  const t = e.target.closest('[data-set]');
+  if(t){ set(M, t.dataset.set, +t.dataset.val); drawPanel(); draw(); return; }
+  const g = e.target.closest('[data-toggle]');
+  if(g){ set(M, g.dataset.toggle, !get(M, g.dataset.toggle)); drawPanel(); draw(); return; }
+  const pf = e.target.closest('[data-pf]');
+  if(pf){
+    const k = pf.dataset.pf;
+    if(k === 'favorite') M.favorite = !M.favorite;
+    if(k === 'mingle')   M.mingle   = !M.mingle;
+    if(k === 'outfit')   M.body.dress = !M.body.dress;
+    if(k === 'favorite' || k === 'mingle' || k === 'outfit'){ drawPanel(); draw(); }
+  }
+});
+
+panelEl.addEventListener('input', e=>{
+  const w = e.target.closest('[data-wheel]');
+  if(w){ set(M, w.dataset.wheel, w.value); draw(); return; }
+  if(e.target.id === 'pfName'){ M.name = e.target.value; persist(); return; }
+  if(e.target.id === 'pfCreator'){ M.creator = e.target.value; persist(); return; }
+  const r = e.target.closest('[data-range]'); if(!r) return;
+  const v = +r.value;
+  set(M, r.dataset.range, v);
+  r.style.setProperty('--p', ((v - +r.min) / (+r.max - +r.min) * 100).toFixed(1) + '%');
+  draw();
+});
+panelEl.addEventListener('change', e=>{
+  if(e.target.closest('[data-wheel]')){ drawPanel(); return; }
+  const b = e.target.closest('[data-pf]');
+  if(b && b.dataset.pf === 'bm'){ M.birthday.m = +b.value; persist(); return; }
+  if(b && b.dataset.pf === 'bd'){ M.birthday.d = +b.value; persist(); return; }
+  if(e.target.closest('[data-range]')) drawPanel();
+});
+
+/* ---------- randomise / reset ---------- */
+const ri = n => Math.floor(Math.random()*n);
+const rf = (a,b) => Math.round((a + Math.random()*(b-a)) * 1000) / 1000;
+$('#btnRandom').innerHTML = SI.dice;
+$('#btnReset').innerHTML  = SI.undo;
+$('#btnSave').innerHTML   = SI.save;
+
+$('#btnRandom').addEventListener('click', ()=>{
+  const beardy = Math.random() < .35;
+  M = {
+    name: M.name, creator: M.creator, favorite: M.favorite,
+    mingle: M.mingle, birthday: M.birthday, skin: ri(SKINS.length),
+    face   :{shape:ri(FACES.length), size:rf(.92,1.08), width:rf(.9,1.1), jaw:rf(.88,1.14)},
+    hair   :{style:ri(HAIRS.length), color:ri(HAIRC.length), y:rf(-8,8), size:rf(.95,1.08), flip:Math.random()<.5},
+    brows  :{style:ri(BROWS.length), color:ri(HAIRC.length), y:rf(-10,10), spacing:rf(-6,10), size:rf(.85,1.2), rot:rf(-14,14)},
+    eyes   :{style:ri(EYES.length), color:ri(EYEC.length), y:rf(-10,10), spacing:rf(-6,12), size:rf(.85,1.15), stretch:rf(.85,1.15), rot:rf(-12,12)},
+    nose   :{style:ri(NOSES.length), x:rf(-6,6), y:rf(-10,12), size:rf(.85,1.25), width:rf(.8,1.3)},
+    mouth  :{style:ri(MOUTHS.length), color:ri(MOUTHC.length), x:rf(-6,6), y:rf(-10,14), size:rf(.85,1.15), stretch:rf(.85,1.2)},
+    beard  :{must: beardy?ri(MUSTACHES.length):0, style: beardy?ri(BEARDS.length):0, color:ri(HAIRC.length), size:rf(.85,1.2), y:rf(-8,8)},
+    glasses:{style: Math.random()<.35 ? 1+ri(GLASSES.length-1) : 0, color:ri(GLASSC.length), y:rf(-6,6), size:rf(.9,1.1)},
+    mole   :{on: Math.random()<.18, x:rf(-120,45), y:rf(-70,60), size:rf(.8,1.4)},
+    hat    :{style: Math.random()<.35 ? 1+ri(HATS.length-1) : 0, color:ri(HATC.length)},
+    jewel  :Object.assign({color:0}, Object.fromEntries(JEWEL_KEYS.map(k=>[k, Math.random()<.22]))),
+    body   :{color:ri(SHIRTC.length), pants:DEFAULT().body.pants, shoes:DEFAULT().body.shoes, dress:Math.random()<.4, build:rf(.86,1.16), height:rf(.9,1.1)}
+  };
+  drawAll();
+});
+
+$('#btnReset').addEventListener('click', ()=>{
+  if(!confirm('Reset this Mii back to the default?')) return;
+  const keep = {name:M.name, creator:M.creator, favorite:M.favorite, mingle:M.mingle, birthday:M.birthday};
+  M = Object.assign(DEFAULT(), keep); drawAll();
+});
+
+/* ---------- export ---------- */
+$('#btnSave').addEventListener('click', ()=>{
+  const vb = svgEl.getAttribute('viewBox').split(' ').map(Number);
+  const scale = 2.2, W = Math.round(vb[2]*scale), H = Math.round(vb[3]*scale);
+  const src = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="${vb.join(' ')}">${svgEl.innerHTML}</svg>`;
+  const url = URL.createObjectURL(new Blob([src], {type:'image/svg+xml;charset=utf-8'}));
+  const img = new Image();
+  img.onload = ()=>{
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    x.fillStyle = '#ffffff'; x.fillRect(0,0,W,H);
+    x.drawImage(img,0,0,W,H);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = (M.name || 'mii').replace(/[^\w\-]+/g,'_') + '.png';
+    a.href = c.toDataURL('image/png'); a.click();
+  };
+  img.onerror = ()=>{ URL.revokeObjectURL(url); alert('Could not export this Mii.'); };
+  img.src = url;
+});
+
+/* ---------- persistence ---------- */
+function persist(){ try{ localStorage.setItem('mii.studio.v2', JSON.stringify(M)); }catch{} }
+function restore(){
+  try{
+    const raw = localStorage.getItem('mii.studio.v2'); if(!raw) return;
+    const saved = JSON.parse(raw), d = DEFAULT();
+    for(const k in d){
+      if(saved[k] == null) continue;
+      M[k] = (d[k] && typeof d[k] === 'object') ? Object.assign({}, d[k], saved[k]) : saved[k];
+    }
+    clampIndices();
+  }catch{}
+}
+
+/* A save from an older build can hold a style or colour index that no longer
+   exists (the nose list shrank, for one). Pull every index back in range. */
+function clampIndices(){
+  const fix = (path, list) => {
+    const v = get(M, path);
+    if(typeof v === 'string') return;                 // a wheel colour, not an index
+    set(M, path, Math.min(Math.max(0, Math.round(+v) || 0), list.length - 1));
+  };
+  fix('skin', SKINS);              fix('face.shape', FACES);
+  fix('hair.style', HAIRS);        fix('hair.color', HAIRC);
+  fix('brows.style', BROWS);       fix('brows.color', HAIRC);
+  fix('eyes.style', EYES);         fix('eyes.color', EYEC);
+  fix('nose.style', NOSES);
+  fix('mouth.style', MOUTHS);      fix('mouth.color', MOUTHC);
+  fix('beard.must', MUSTACHES);    fix('beard.style', BEARDS);   fix('beard.color', HAIRC);
+  fix('glasses.style', GLASSES);   fix('glasses.color', GLASSC);
+  fix('hat.style', HATS);          fix('hat.color', HATC);
+  fix('jewel.color', JEWELC);
+  fix('body.color', SHIRTC);       fix('body.pants', PANTSC);    fix('body.shoes', SHOEC);
+}
+
+restore();
+syncPage();
+drawAll();
+</script>
+</body>
+</html>
