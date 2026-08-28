@@ -343,6 +343,30 @@ const HAIRS = [
        <g fill="${c}">${ring(26, 114, .86, 200, [14,17,15], 7)}</g>
        <g fill="${shade(c,.08)}">${ring(19, 76, .84, 198, [11,14,12], 5)}</g>
        <g fill="${shade(c,.05)}">${ring(13, 42, .8, 196, [10,12], 3)}</g>`;
+   }},
+
+  /* --- a bob grown out to the collarbone, waved --- */
+  {n:'Wavy Bob',
+   back:c=>`<path d="M 146 216 C 122 300, 124 380, 140 434
+       Q 169 458 198 436 Q 227 458 256 438 Q 285 458 314 436 Q 343 458 372 434
+       C 388 380, 390 300, 366 216 Z" fill="${shade(c,-.06)}"/>`,
+   /* The cap, then a waved strand down each side.  Front hair is drawn over the
+      body, so these fall in front of the shoulders — which is the only place
+      the wave is actually visible; a hem alone sits behind the shirt. */
+   front:c=>{
+     /* Tapered to a point up under the cap so the lock falls out of the hair
+        rather than starting at a flat edge partway down the cheek. */
+     const strand = (x, dir) => `<path d="M ${x + dir*12} 190
+       Q ${x - dir*17} 296 ${x + dir*5} 342 Q ${x + dir*23} 388 ${x} 432
+       L ${x + dir*48} 436
+       Q ${x + dir*63} 388 ${x + dir*47} 342 Q ${x + dir*33} 288 ${x + dir*40} 236
+       C ${x + dir*34} 212, ${x + dir*26} 194, ${x + dir*12} 190 Z"
+       fill="${c}"/>`;
+     return `<path d="M 140 302 C 130 168, 190 98, 256 98 C 322 98, 382 168, 372 302
+         C 364 220, 344 180, 256 180 C 168 180, 148 220, 140 302 Z" fill="${c}"/>
+       ${strand(140, 1)}${strand(372, -1)}
+       <path d="M 166 190 C 202 162, 300 158, 344 184 C 300 170, 210 174, 166 190 Z"
+         fill="${shade(c,.09)}"/>`;
    }}
 ];
 

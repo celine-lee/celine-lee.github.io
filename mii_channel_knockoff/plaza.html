@@ -226,8 +226,15 @@ function poseLimbs(p, arm, leg){
   }
 }
 
+/* Everybody is scaled against one reference body rather than against their own
+   height.  Dividing by a Mii's own height, as this used to, cancels exactly what
+   the Build and Height sliders change, so a tall Mii came out the same size as
+   a short one.  Against a fixed reference they keep their proportions.
+   The spread is about ±9%: the head is a fixed size and only the body stretches,
+   so that is genuinely how much taller a tall Mii is. */
+const REF_BOTTOM = bodyGeom({body:{build:1, height:1}}).bottom;
 function heightOf(p){ return scaleOf(p) * (p.bottom - 40); }
-function scaleOf(p){ return depthAt(p.y) * (1 + 0.16*p.lift) * (H * 0.17) / (p.bottom - 40); }
+function scaleOf(p){ return depthAt(p.y) * (1 + 0.16*p.lift) * (H * 0.17) / (REF_BOTTOM - 40); }
 function place(p, rot){
   const sc = scaleOf(p);
   p.g.setAttribute('transform',
