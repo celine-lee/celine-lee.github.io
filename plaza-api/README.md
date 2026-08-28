@@ -73,18 +73,25 @@ Provisioning at [upstash.com](https://upstash.com) directly and pasting the two
 values in by hand works the same way. Either way the free tier is far more than
 this needs — a send is two Redis commands.
 
-Redis takes over on its own once both are present. To confirm it did:
+Redis takes over on its own once both are present. **Vercel only picks up new
+environment variables on a redeploy**, so attaching the database is not enough
+on its own — redeploy afterwards, or the function goes on running without it.
+
+To confirm:
 
 ```bash
 curl -si -X POST https://<your-project>.vercel.app/api/submit \
   -H 'content-type: application/json' -d '{"name":"","mii":{}}' | grep -i x-plaza-ratelimit
 ```
 
-That payload is refused for having no nickname, so nothing is created, but the
-header still reports which limiter ran. `redis` means it is live.
-`memory-fallback` means the variables are set but Redis is not answering — the
-count falls back to the in-memory bucket rather than letting everyone through,
-so the endpoint stays limited either way.
+That payload is refused for having no nickname, so nothing is created and no
+send is counted, but the header still reports which limiter is configured.
+`redis` means it is wired up.
+
+A request that gets far enough to actually be counted reports what *answered*,
+which can differ: `memory-fallback` means the variables are set but Redis would
+not answer, and the count fell back to the in-memory bucket rather than letting
+everyone through — so the endpoint stays limited either way.
 
 #### How the counter works
 

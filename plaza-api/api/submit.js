@@ -239,6 +239,11 @@ export default async function handler(req, res){
   if(!TOKEN)
     return fail(res, 503, 'unconfigured', 'The Plaza postbox is not set up yet.');
 
+  /* Which limiter is configured, said before anything can turn the request away
+     short of the counter.  Checking that Redis is wired up should not have to
+     spend one of the sends it is there to ration. */
+  res.setHeader('x-plaza-ratelimit', UPSTASH_URL && UPSTASH_TOKEN ? 'redis' : 'memory');
+
   /* --- size cap, before anything else touches the payload --- */
   if(Number(req.headers['content-length'] || 0) > MAX_BYTES)
     return fail(res, 413, 'too-big', 'That Mii is far too large to send.');
@@ -264,7 +269,7 @@ export default async function handler(req, res){
   const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || '')
                .split(',')[0].trim() || 'unknown';
   const limit = await rateCheck(ip);
-  res.setHeader('x-plaza-ratelimit', limit.backend);
+  res.setHeader('x-plaza-ratelimit', limit.backend);   // what answered, which may differ
   if(limit.over)
     return fail(res, 429, 'rate', 'That is a lot of Miis. Try again in a little while.');
   /* --- the queue: how long it is, and whether this nickname is already in it --- */
