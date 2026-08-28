@@ -1,0 +1,102 @@
+{
+  "id": "palina",
+  "name": "Palina",
+  "mii": {
+    "favorite": false,
+    "mingle": true,
+    "birthday": {
+      "m": 1,
+      "d": 1
+    },
+    "skin": 1,
+    "face": {
+      "shape": 3,
+      "size": 1,
+      "width": 1.02,
+      "jaw": 1.09
+    },
+    "hair": {
+      "style": 30,
+      "color": 6,
+      "y": 0,
+      "size": 1,
+      "flip": false
+    },
+    "brows": {
+      "style": 7,
+      "color": 6,
+      "y": 6.5,
+      "spacing": 1.5,
+      "size": 0.915,
+      "rot": -4
+    },
+    "eyes": {
+      "style": 13,
+      "color": 1,
+      "y": 0,
+      "spacing": 1,
+      "size": 1.02,
+      "stretch": 1,
+      "rot": 0
+    },
+    "nose": {
+      "style": 0,
+      "x": 0,
+      "y": 2,
+      "size": 0.88,
+      "width": 0.95
+    },
+    "mouth": {
+      "style": 3,
+      "color": 0,
+      "x": 0,
+      "y": 3,
+      "size": 0.95,
+      "stretch": 1.05
+    },
+    "beard": {
+      "must": 0,
+      "style": 0,
+      "color": 0,
+      "size": 1,
+      "y": 0
+    },
+    "glasses": {
+      "style": 6,
+      "color": 1,
+      "y": 3,
+      "size": 1.25
+    },
+    "hat": {
+      "style": 0,
+      "color": 11
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": true,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": true,
+      "dropR": true,
+      "necklace": false,
+      "choker": false
+    },
+    "mole": {
+      "on": false,
+      "color": 1,
+      "x": -101,
+      "y": 15,
+      "size": 1.51
+    },
+    "body": {
+      "color": 9,
+      "pants": 3,
+      "shoes": 0,
+      "dress": false,
+      "build": 0.945,
+      "height": 1
+    },
+    "name": "Palina"
+  }
+}
