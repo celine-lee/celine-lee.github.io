@@ -367,6 +367,52 @@ const HAIRS = [
        ${strand(140, 1)}${strand(372, -1)}
        <path d="M 166 190 C 202 162, 300 158, 344 184 C 300 170, 210 174, 166 190 Z"
          fill="${shade(c,.09)}"/>`;
+   }},
+
+  /* --- big ringlets, falling well past the shoulders --- */
+  {n:'Big Curls', hl:188,
+   back:c=>{
+     /* A filled mass so no floor shows through the gaps, then ringlets down
+        both edges to break the silhouette.  Everything is laid out from the
+        index so the same Mii draws the same way every time. */
+     let curls = '';
+     for(let i = 0; i < 10; i++){
+       const y = 222 + i*32;
+       const w = 112 + Math.sin(i*0.62) * 20;          // the mass bells out at the chest
+       const r = 27 + ((i*5) % 3) * 6;
+       curls += `<circle cx="${(256-w).toFixed(1)}" cy="${y}" r="${r}"/>`
+             +  `<circle cx="${(256+w).toFixed(1)}" cy="${y}" r="${r}"/>`
+             +  `<circle cx="${(256-w+40).toFixed(1)}" cy="${y+15}" r="${r*0.78}"/>`
+             +  `<circle cx="${(256+w-40).toFixed(1)}" cy="${y+15}" r="${r*0.78}"/>`;
+     }
+     return `<path d="M 152 208 C 116 300, 118 424, 148 502 L 364 502
+         C 394 424, 396 300, 360 208 Z" fill="${shade(c,-.09)}"/>
+       <g fill="${shade(c,-.04)}">${curls}</g>`;
+   },
+   /* Front hair draws over the body, so a curl put here falls in front of the
+      shoulder where it can be seen; one left in the back panel is behind the
+      shirt. */
+   front:c=>{
+     let crown = '', side = '';
+     /* The crown is deliberately the calmest part: shallower ringlets sitting
+        closer in, so the volume is there but the top reads round rather than
+        knobbly, and the curl proper belongs to the fall. */
+     for(let i = 0; i < 11; i++){                      // ringlets around the hairline
+       const a = Math.PI*1.04 + i * (Math.PI*0.92/10);
+       const r = 116 + ((i*7) % 3) * 4;
+       crown += `<circle cx="${(256+Math.cos(a)*r).toFixed(1)}"
+         cy="${(230+Math.sin(a)*r*0.86).toFixed(1)}" r="${20 + ((i*5)%3)*3}"/>`;
+     }
+     for(let i = 0; i < 5; i++){                       // and a fall down each side
+       const y = 268 + i*40;
+       const x = 150 - Math.sin(i*0.8)*12;
+       const r = 26 + ((i*3) % 2) * 5;
+       side += `<circle cx="${x.toFixed(1)}" cy="${y}" r="${r}"/>`
+            +  `<circle cx="${(512-x).toFixed(1)}" cy="${y}" r="${r}"/>`;
+     }
+     return `<path d="M 146 268 C 136 168, 190 104, 256 104 C 322 104, 376 168, 366 268
+         C 358 214, 336 184, 256 184 C 176 184, 154 214, 146 268 Z" fill="${c}"/>
+       <g fill="${c}">${crown}${side}</g>`;
    }}
 ];
 
