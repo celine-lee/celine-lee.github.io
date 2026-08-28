@@ -46,24 +46,51 @@ The endpoint is public, so it assumes bad input and bounds the damage four ways:
   ranges, and a colour must be an index or a `#rrggbb`. The nickname is the only
   free text that survives, and the Plaza renders it as text.
 - **Per-IP rate limit** — `RATE_MAX` sends per `RATE_WINDOW` (3 per hour).
-  In-memory by default, which is per-instance and best-effort.
+  In-memory by default, which is per-instance and best-effort; durable with
+  Redis, below. Every response carries `x-plaza-ratelimit` saying which one
+  answered: `redis`, `memory`, or `memory-fallback` when Redis was configured
+  but would not answer.
 - **Open-PR cap** — refuses to open more than `MAX_OPEN_PRS` (25) pull requests
   that are still waiting. This is the one that holds when somebody rotates IPs.
 
-### Making the rate limit durable (optional)
+### Making the rate limit durable
 
-The in-memory limiter resets whenever Vercel starts a fresh instance. For a
-limit that actually holds, create an [Upstash](https://upstash.com) Redis
-database (the free tier is far more than this needs) and add:
+The in-memory limiter resets whenever Vercel starts a fresh instance, so a
+determined sender only has to wait for a cold start. Redis gives a limit that
+actually holds. This is the only place a datastore earns a slot in this design
+— everything else is already stored in git.
 
-| Variable | Value |
+The easiest route is Vercel's own marketplace: **Storage → Create Database →
+Upstash for Redis**. Attaching it to the project sets the environment variables
+for you, and the function reads either spelling:
+
+| Variable | Also accepted as |
 | --- | --- |
-| `UPSTASH_REDIS_REST_URL` | from the Upstash console |
-| `UPSTASH_REDIS_REST_TOKEN` | from the Upstash console |
+| `UPSTASH_REDIS_REST_URL` | `KV_REST_API_URL` |
+| `UPSTASH_REDIS_REST_TOKEN` | `KV_REST_API_TOKEN` |
 
-The function switches to Redis on its own when both are present. This is the
-only place a datastore earns a slot in this design — everything else is already
-stored in git.
+Provisioning at [upstash.com](https://upstash.com) directly and pasting the two
+values in by hand works the same way. Either way the free tier is far more than
+this needs — a send is two Redis commands.
+
+Redis takes over on its own once both are present. To confirm it did:
+
+```bash
+curl -si -X POST https://<your-project>.vercel.app/api/submit \
+  -H 'content-type: application/json' -d '{"name":"","mii":{}}' | grep -i x-plaza-ratelimit
+```
+
+That payload is refused for having no nickname, so nothing is created, but the
+header still reports which limiter ran. `redis` means it is live.
+`memory-fallback` means the variables are set but Redis is not answering — the
+count falls back to the in-memory bucket rather than letting everyone through,
+so the endpoint stays limited either way.
+
+#### How the counter works
+
+`SET key 0 EX <window> NX` then `INCR key`, pipelined. `SET..NX` leaves an
+existing counter alone, so the window is fixed from the first request in it, and
+no path can leave a key without a TTL — which would block that address forever.
 
 ## Local
 

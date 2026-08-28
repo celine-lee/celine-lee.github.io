@@ -12,10 +12,13 @@
      GITHUB_REPO     "owner/name".   default celine-lee/celine-lee.github.io
      GITHUB_BASE     branch to open against.  default main
      ALLOWED_ORIGIN  comma-separated origins allowed to call this.
-     UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
+     UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN   (or KV_REST_API_URL /
+                     KV_REST_API_TOKEN, which is what the Vercel marketplace
+                     integration sets)
                      optional.  With them the per-IP limit is durable and
                      shared across instances; without them it is a per-instance
                      best effort, backed up by the open-pull-request cap below.
+                     Which one answered is reported as x-plaza-ratelimit.
      MAX_BYTES / RATE_MAX / RATE_WINDOW / MAX_OPEN_PRS   optional overrides.
    ============================================================ */
 
@@ -125,17 +128,17 @@ const slugify = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 /* ============================================================
    RATE LIMITING
    ============================================================ */
-const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL   || '';
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+/* Provisioning Upstash through the Vercel marketplace and provisioning it
+   directly do not agree on what to call these, so accept either spelling. */
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL   || process.env.KV_REST_API_URL   || '';
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '';
 
-/* Per-instance fallback.  Vercel keeps a warm instance around for a while, so
-   this catches the obvious hammering; the open-pull-request cap below catches
-   what slips past it. */
+/* Per-instance counter.  Vercel keeps a warm instance around for a while, so
+   this catches the obvious hammering on its own, and it is what Redis falls
+   back to rather than a fallback to letting everybody through. */
 const buckets = new Map();
 
-async function overRateLimit(ip){
-  if(UPSTASH_URL && UPSTASH_TOKEN) return upstashOver(ip);
-
+function memoryOver(ip){
   const now = Date.now(), b = buckets.get(ip);
   if(!b || now > b.reset){
     buckets.set(ip, {n: 1, reset: now + RATE_WINDOW * 1000});
@@ -146,20 +149,41 @@ async function overRateLimit(ip){
   return b.n > RATE_MAX;
 }
 
-/* INCR the counter, and put an expiry on it the first time we see it. */
-async function upstashOver(ip){
+/* Which limiter actually answered is reported back on the response, because
+   the difference between a durable limit and a per-instance one is invisible
+   from the outside and worth being able to check. */
+async function rateCheck(ip){
+  if(UPSTASH_URL && UPSTASH_TOKEN){
+    const n = await upstashCount(ip);
+    if(n !== null) return {over: n > RATE_MAX, backend: 'redis'};
+    return {over: memoryOver(ip), backend: 'memory-fallback'};
+  }
+  return {over: memoryOver(ip), backend: 'memory'};
+}
+
+/* Create the counter with its expiry already attached, then count.  SET..NX
+   leaves an existing counter alone, so the window is fixed from the first
+   request in it — and no path can leave a key sitting there without a TTL,
+   which would block that address for good.
+   Returns null, not a verdict, when Redis cannot be reached: that is a
+   question unanswered rather than a no, and the caller counts in memory. */
+async function upstashCount(ip){
   const key = `plaza:rate:${ip}`;
   try{
     const res = await fetch(`${UPSTASH_URL}/pipeline`, {
       method: 'POST',
       headers: {authorization: `Bearer ${UPSTASH_TOKEN}`, 'content-type': 'application/json'},
-      body: JSON.stringify([['INCR', key], ['EXPIRE', key, String(RATE_WINDOW), 'NX']])
+      body: JSON.stringify([
+        ['SET',  key, '0', 'EX', String(RATE_WINDOW), 'NX'],
+        ['INCR', key]
+      ])
     });
-    if(!res.ok) return false;                         // never lock people out over an outage
+    if(!res.ok) return null;
     const out = await res.json();
-    return Number(out && out[0] && out[0].result) > RATE_MAX;
+    const n = out && out[1] && Number(out[1].result);
+    return Number.isFinite(n) ? n : null;
   }catch{
-    return false;
+    return null;
   }
 }
 
@@ -239,7 +263,9 @@ export default async function handler(req, res){
   /* --- rate limits --- */
   const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || '')
                .split(',')[0].trim() || 'unknown';
-  if(await overRateLimit(ip))
+  const limit = await rateCheck(ip);
+  res.setHeader('x-plaza-ratelimit', limit.backend);
+  if(limit.over)
     return fail(res, 429, 'rate', 'That is a lot of Miis. Try again in a little while.');
   /* --- the queue: how long it is, and whether this nickname is already in it --- */
   const waiting = await openPlazaPRs();
