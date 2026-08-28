@@ -262,10 +262,20 @@ button.field:active{background:#e8e5e0}
 .sendrow button{
   flex:1;padding:10px 12px;border-radius:10px;font-weight:700;
   background:#f2f5f5;border:1px solid #a4afaf;transition:background .12s;
+  display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;
 }
+.sendrow button svg{width:17px;height:17px;flex:none}
 .sendrow button:hover{background:#fff}
 .sendrow .go{color:#fff;background:var(--accent);border-color:var(--accent-d)}
 .sendrow .go:hover{background:var(--accent-lt)}
+/* once the postbox has taken the Mii — or refused it — there is nothing to copy */
+.sendcard.sent #sendCode, .sendcard.sent #sendCopy,
+.sendcard.plain #sendCode, .sendcard.plain #sendCopy,
+.sendcard.sending #sendCode, .sendcard.sending #sendCopy{display:none}
+.sendcard.sending #sendDone{opacity:.55;pointer-events:none}
+.sendlink{margin:2px 0 0;font-size:13px}
+.sendlink:empty{display:none}
+.sendlink a{color:var(--accent-d);font-weight:700}
 </style>
 </head>
 <body>
@@ -293,13 +303,15 @@ button.field:active{background:#e8e5e0}
   </div>
 </div>
 <div class="scrim" id="sendScrim" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
-  <div class="sendcard">
+  <div class="sendcard" id="sendCard">
     <h2 id="sendTitle">Copied.</h2>
     <p id="sendNote">Paste this to Celine however you like — she'll add you to the Plaza.</p>
     <textarea id="sendCode" readonly spellcheck="false" aria-label="Your Mii's code"></textarea>
+    <p class="sendlink" id="sendLink"></p>
     <div class="sendrow">
       <button id="sendCopy">Copy again</button>
-      <button id="sendDone" class="go">Done</button>
+      <button id="sendPlaza"><span id="sendPlazaIc"></span>Go to the Plaza</button>
+      <button id="sendDone" class="go">Back to editor</button>
     </div>
   </div>
 </div>
@@ -359,6 +371,12 @@ const IC = {
            <path d="M9.4 17c1.3 1.1 3.9 1.1 5.2 0"/>
            <path fill="currentColor" stroke="none"
                  d="M12 12c1.6-1.9 5.6-1.8 5.6 1.05 0 1.9-3.15 2.4-5.6-.2-2.45 2.6-5.6 2.1-5.6.2C6.4 10.2 10.4 10.1 12 12z"/></svg>`,
+  /* a spot low on the cheek beside the mouth — framed like the beard icons */
+  mole: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+           <ellipse cx="12" cy="12" rx="8.2" ry="9.2"/>
+           <path d="M9.4 17c1.3 1.1 3.9 1.1 5.2 0"/>
+           <circle cx="7.4" cy="13.8" r="1.7" fill="currentColor" stroke="none"/></svg>`,
   glass: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
            stroke-linecap="round" stroke-linejoin="round">
            <g fill="currentColor" stroke="none">
@@ -463,8 +481,11 @@ const TABS = [
    {t:'sliders', when:(m,sub)=>sub===0, items:[
      ['glasses.size','Size',.75,1.25,.005,'pct'],
      ['glasses.y','Vertical',-22,24,.5,'num']]},
-   {t:'toggles', items:[['mole.on','Beauty Mark']]},
-   {t:'sliders', title:'Beauty Mark', when:m=>m.mole.on, items:[
+   {t:'toggles', items:[['mole.on','Beauty Spot']]},
+   /* dark for a mole, or a shade under the skin for a dimple */
+   {t:'colors', title:'Beauty Spot', path:'mole.color', list:m=>moleColors(m),
+    when:m=>m.mole.on},
+   {t:'sliders', title:'Beauty Spot', when:m=>m.mole.on, items:[
      ['mole.size','Size',.6,1.8,.01,'pct'],
      ['mole.x','Horizontal',-130,52,1,'num'],
      ['mole.y','Vertical',-70,60,1,'num']]}
@@ -560,7 +581,7 @@ const SEC_IC = {
   'glasses.style':IC.glassOnly, 'glasses.color':IC.glassOnly, 'hat.style':IC.hat, 'hat.color':IC.hat,
   'jewel.color':IC.earring
 };
-const TOG_IC = {'hair.flip':SI.flip, 'mole.on':SI.mark, 'body.dress':SI.dress};
+const TOG_IC = {'hair.flip':SI.flip, 'mole.on':IC.mole, 'body.dress':SI.dress};
 
 function thumb(path, idx, view, selected){
   const t = structuredClone(M);
@@ -692,14 +713,15 @@ function drawPanel(){
     }
 
     if(sec.t === 'colors'){
+      const list = typeof sec.list === 'function' ? sec.list(M) : sec.list;
       const cur = get(M, sec.path);
       const custom = typeof cur === 'string';
       side += `<div class="swatches">`
-           +  sec.list.map((c,i)=>
+           +  list.map((c,i)=>
                 `<button class="sw${!custom && i===cur ? ' on' : ''}" data-set="${sec.path}" data-val="${i}"
                    style="background:${c}" title="${sec.title}" aria-label="${sec.title} ${i+1}"></button>`).join('')
            +  `<label class="sw wheel${custom ? ' on' : ''}" title="${sec.title} — custom colour">
-                 <input type="color" data-wheel="${sec.path}" value="${custom ? cur : pick(sec.list, cur)}"
+                 <input type="color" data-wheel="${sec.path}" value="${custom ? cur : pick(list, cur)}"
                         aria-label="${sec.title} colour picker"></label>`
            +  `</div>`;
     }
@@ -801,6 +823,7 @@ $('#btnReset').innerHTML  = SI.undo;
 $('#btnSave').innerHTML   = SI.save;
 $('#btnExport').innerHTML = SI.send;
 $('#btnPlaza').innerHTML  = SI.people;
+$('#sendPlazaIc').innerHTML = SI.people;
 
 /* ---------- plaza ---------- */
 let toastT = 0;
@@ -811,34 +834,114 @@ function toast(msg){
   toastT = setTimeout(()=>el.classList.remove('on'), 2600);
 }
 
-/* Sending a Mii over drops them into this browser's plaza straight away and
-   hands back their code. Copying can fail — an insecure origin, an old browser,
-   a denied permission — so the code is always shown as selectable text too. */
+/* Sending a Mii over drops them into this browser's plaza straight away, and
+   then tries the postbox, which opens the pull request that makes it permanent.
+   With no postbox — or a postbox that will not answer — the studio falls back
+   to handing back the code, so the button always leads somewhere. */
 async function copyText(t){
   try{ await navigator.clipboard.writeText(t); return true; }catch{ return false; }
 }
-function showSend(name, code, copied){
+
+function openSend(state){
+  $('#sendCard').className = 'sendcard' + (state ? ' ' + state : '');
+  $('#sendLink').textContent = '';
+  $('#sendScrim').classList.add('on');
+}
+
+/* Copying can fail — an insecure origin, an old browser, a denied permission —
+   so the code is always shown as selectable text too. */
+function showSend(name, code, copied, why){
+  openSend();
   $('#sendTitle').textContent = copied ? 'Copied.' : `${name} is ready to send.`;
-  $('#sendNote').textContent  = copied
-    ? "Paste this to Celine however you like — she'll add you to the Plaza."
-    : "Copy this and send it to Celine however you like — she'll add you to the Plaza.";
+  $('#sendNote').textContent  =
+      (why ? why + ' ' : '')
+    + (copied ? "Paste this to Celine however you like — she'll add you to the Plaza."
+              : "Copy this and send it to Celine however you like — she'll add you to the Plaza.");
   const box = $('#sendCode');
   box.value = code;
-  $('#sendScrim').classList.add('on');
   box.focus(); box.select();
   box.scrollTop = 0;                 // select() lands at the end; show the start
 }
+
+function showSending(name){
+  openSend('sending');
+  $('#sendTitle').textContent = `Sending ${name} over…`;
+  $('#sendNote').textContent  = 'Knocking on the Plaza gate.';
+}
+
+function showSent(name, url){
+  openSend('sent');
+  $('#sendTitle').textContent = `${name} is on the way.`;
+  $('#sendNote').textContent  =
+    'Celine has been handed a pull request. Once she merges it you will be in the Plaza for everybody.';
+  if(url){
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.textContent = 'Watch it land';
+    $('#sendLink').replaceChildren(a);
+  }
+}
+
+/* A refusal the visitor has to act on, so it gets the card rather than a toast
+   that slides away while they are still reading it. */
+function showRefused(title, note){
+  openSend('plain');
+  $('#sendTitle').textContent = title;
+  $('#sendNote').textContent  = note;
+}
+const nameTaken = name => showRefused(`“${name}” is taken.`,
+  'Somebody in the Plaza already goes by that nickname. Pick a different one under '
+  + 'Mii Info and send this Mii over again.');
+const alreadySent = name => showRefused(`${name} is already on the way.`,
+  'You have sent this Mii over once already, and Celine has it. To send a second '
+  + 'Mii, give it its own nickname under Mii Info first.');
+const alreadyPending = name => showRefused(`“${name}” is already in the queue.`,
+  'A Mii under that nickname is waiting for Celine to let it in. If that one was '
+  + 'not yours, pick a different nickname under Mii Info and send again.');
+
 function hideSend(){ $('#sendScrim').classList.remove('on'); }
 
+let sending = false;
 $('#btnExport').addEventListener('click', async ()=>{
+  if(sending) return;                       // one send at a time, or one Mii arrives twice
   if(!M.mingle){ toast('Turn Mingle on in Mii Info first.'); return; }
-  const r = rosterAdd(M);
-  if(r.reason === 'noname')    return toast('Give this Mii a nickname first.');
-  if(r.reason === 'resident')  return toast(`“${r.name}” already lives in the Plaza.`);
-  if(r.reason === 'duplicate') return toast(`“${r.name}” is already in your Plaza.`);
+
   const code = submissionCode(M);
-  toast(`${r.name} joined your Plaza.`);
-  showSend(r.name, code, await copyText(code));
+  const r    = rosterAdd(M);
+  const name = r.name || String(M.name || '').trim();
+
+  if(r.reason === 'noname')   return toast('Give this Mii a nickname first.');
+  if(r.reason === 'resident') return nameTaken(name);
+  if(r.reason === 'duplicate'){
+    /* Already in this browser's plaza.  With no postbox the code is the whole
+       point, so hand it back again; with one, this is either a second click on
+       a Mii that already went through, or a retry after a send that did not. */
+    if(!PLAZA_API)         return showSend(name, code, await copyText(code));
+    if(rosterSent(name))   return alreadySent(name);
+  }else{
+    toast(`${name} joined your Plaza.`);
+  }
+
+  if(!PLAZA_API) return showSend(name, code, await copyText(code));
+
+  showSending(name);
+  sending = true;
+  const sent = await sendToPlaza(M).finally(()=>{ sending = false; });
+  if(sent.ok){
+    rosterMarkSent(name);
+    return showSent(name, sent.url);
+  }
+
+  /* The nickname belongs to somebody else after all, so stop claiming it here
+     too — otherwise the retry would look like a duplicate rather than a clash. */
+  if(sent.reason === 'taken'){ rosterRemove(name); return nameTaken(name); }
+  if(sent.reason === 'pending'){ rosterMarkSent(name); return alreadyPending(name); }
+  if(sent.reason === 'rate' || sent.reason === 'queue')
+    return showRefused('Not just now.', sent.message);
+
+  /* Anything else is the postbox's problem rather than theirs: hand back the
+     code so the send still goes somewhere. */
+  showSend(name, code, await copyText(code), 'The Plaza postbox is not answering.');
 });
 
 $('#sendCopy').addEventListener('click', async ()=>{
@@ -851,6 +954,7 @@ $('#sendDone').addEventListener('click', hideSend);
 $('#sendScrim').addEventListener('click', e=>{ if(e.target === $('#sendScrim')) hideSend(); });
 document.addEventListener('keydown', e=>{ if(e.key === 'Escape') hideSend(); });
 $('#btnPlaza').addEventListener('click', ()=>{ location.href = 'plaza.html'; });
+$('#sendPlaza').addEventListener('click', ()=>{ location.href = 'plaza.html'; });
 
 $('#btnRandom').addEventListener('click', ()=>{
   const keep = {name:M.name, favorite:M.favorite,
@@ -919,7 +1023,7 @@ function clampIndices(){
   fix('beard.must', MUSTACHES);    fix('beard.style', BEARDS);   fix('beard.color', HAIRC);
   fix('glasses.style', GLASSES);   fix('glasses.color', GLASSC);
   fix('hat.style', HATS);          fix('hat.color', HATC);
-  fix('jewel.color', JEWELC);
+  fix('jewel.color', JEWELC);   fix('mole.color', moleColors(M));
   fix('body.color', SHIRTC);       fix('body.pants', PANTSC);    fix('body.shoes', SHOEC);
 }
 

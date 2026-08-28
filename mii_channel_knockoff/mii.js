@@ -88,6 +88,12 @@ function shade(hex, amt){                    // lighten (+) / darken (-) a hex c
   return '#' + [f(n>>16&255), f(n>>8&255), f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+/* The beauty spot comes in two: a dark mole, or a shade just under the wearer's
+   own skin, which reads as a dimple.  The second has to be worked out from the
+   skin tone, so this is a function where the other palettes are flat lists. */
+const MOLE_DARK = '#5a4030';
+const moleColors = m => [MOLE_DARK, shade(pick(SKINS, m.skin), -.085)];
+
 const HAIRS = [
   {n:'Bald', front:c=>``},
 
@@ -313,6 +319,30 @@ const HAIRS = [
        <path d="M 344 238 C 360 300, 360 360, 350 418" stroke="${shade(c,-.06)}" stroke-width="20"
          stroke-linecap="round" fill="none"/>`;
      return `<path d="${CAP}" fill="${c}"/>${s}`;
+   }},
+
+  /* --- dense coils cropped close, a rounded natural silhouette --- */
+  {n:'Coily Crop', hl:190,
+   front:c=>{
+     /* The outline is a ring of coils rather than a curve, and the inside is
+        packed with more of them in a lighter shade so the crop reads as
+        texture instead of a helmet.  Both rings are laid out arithmetically
+        so the same Mii draws the same way every time. */
+     const ring = (n, rad, squash, cy, sizes, step) => {
+       let out = '';
+       for(let i=0;i<n;i++){
+         const a = Math.PI*1.02 + i * (Math.PI*0.96/(n-1));
+         const r = rad + ((i*step) % 4) * 3;
+         out += `<circle cx="${(256+Math.cos(a)*r).toFixed(1)}"
+           cy="${(cy+Math.sin(a)*r*squash).toFixed(1)}" r="${sizes[i % sizes.length]}"/>`;
+       }
+       return out;
+     };
+     return `<path d="M 142 272 C 134 178, 186 110, 256 110 C 326 110, 378 178, 370 272
+       C 362 216, 338 188, 256 188 C 174 188, 150 216, 142 272 Z" fill="${c}"/>
+       <g fill="${c}">${ring(26, 114, .86, 200, [14,17,15], 7)}</g>
+       <g fill="${shade(c,.08)}">${ring(19, 76, .84, 198, [11,14,12], 5)}</g>
+       <g fill="${shade(c,.05)}">${ring(13, 42, .8, 196, [10,12], 3)}</g>`;
    }}
 ];
 
@@ -678,7 +708,7 @@ const DEFAULT = () => ({
   hat    :{style:0, color:11},
   jewel  :{color:0, cartL:true, cartR:false, studL:false, studR:false,
            dropL:true, dropR:true, necklace:false, choker:false},
-  mole   :{on:true, x:-85, y:15, size:.69},        // dimple, left cheek
+  mole   :{on:true, color:1, x:-85, y:15, size:.69},   // a dimple, left cheek
   body   :{color:10, pants:3, shoes:0, dress:false, build:.95, height:1}
 });
 
@@ -858,8 +888,9 @@ function svgMii(m, mono){
 
   const glass = GLASSES[m.glasses.style].d
     ? `<g transform="translate(${CX},${eyeY+m.glasses.y}) scale(${m.glasses.size})">${GLASSES[m.glasses.style].d(gc)}</g>` : '';
+  const molec = mono ? (inv ? 'none' : INK) : pick(moleColors(m), m.mole.color);
   const mole = m.mole.on
-    ? `<ellipse cx="${mouthX+40+m.mole.x}" cy="${mouthY-22+m.mole.y}" rx="${5*m.mole.size}" ry="${5*m.mole.size}" fill="#5a4030"/>` : '';
+    ? `<ellipse cx="${mouthX+40+m.mole.x}" cy="${mouthY-22+m.mole.y}" rx="${5*m.mole.size}" ry="${5*m.mole.size}" fill="${molec}"/>` : '';
 
   const headScale = t =>
     `<g transform="translate(${CX},254) scale(${m.face.size}) translate(${-CX},-254)">${t}</g>`;
@@ -944,7 +975,8 @@ function randomMii(rand = Math.random){
     mouth  :{style:ri(MOUTHS.length), color:ri(MOUTHC.length), x:rf(-6,6), y:rf(-10,14), size:rf(.85,1.15), stretch:rf(.85,1.2)},
     beard  :{must: beardy?ri(MUSTACHES.length):0, style: beardy?ri(BEARDS.length):0, color:ri(HAIRC.length), size:rf(.85,1.2), y:rf(-8,8)},
     glasses:{style: rand()<.35 ? 1+ri(GLASSES.length-1) : 0, color:ri(GLASSC.length), y:rf(-6,6), size:rf(.9,1.1)},
-    mole   :{on: rand()<.18, x:rf(-120,45), y:rf(-70,60), size:rf(.8,1.4)},
+    mole   :{on: rand()<.18, color: rand()<.65 ? 0 : 1,
+              x:rf(-120,45), y:rf(-70,60), size:rf(.8,1.4)},
     hat    :{style: rand()<.35 ? 1+ri(HATS.length-1) : 0, color:ri(HATC.length)},
     jewel  :Object.assign({color:0}, Object.fromEntries(JEWEL_KEYS.map(k=>[k, rand()<.22]))),
     body   :{color:ri(SHIRTC.length), pants:ri(PANTSC.length), shoes:ri(SHOEC.length),
@@ -978,7 +1010,7 @@ let COMMITTED = [];
 function normEntry(e, committed){
   const name = String(e && e.name || '').trim();
   if(!name || !e.mii) return null;
-  return {id: rosterKey(name), name, mii: e.mii, committed: !!committed};
+  return {id: rosterKey(name), name, mii: e.mii, sent: !!(e && e.sent), committed: !!committed};
 }
 
 /* Falls back to an empty list when plaza.json cannot be read — opening the
@@ -1005,7 +1037,7 @@ function loadRoster(){
 function saveRoster(list){
   try{
     localStorage.setItem(PLAZA_KEY,
-      JSON.stringify(list.map(({id,name,mii}) => ({id,name,mii}))));
+      JSON.stringify(list.map(({id,name,mii,sent}) => ({id,name,mii,sent: !!sent}))));
   }catch{}
 }
 
@@ -1036,6 +1068,27 @@ function rosterAdd(m){
   return {ok:true, id, name};
 }
 
+/* Did the postbox actually take this one?  A Mii that was added here but never
+   accepted — the postbox was down, or busy — has to be allowed another run at
+   it, or one failed send would lock that nickname out of this browser for good.
+   Only a Mii that really went through counts as a double-submit. */
+function rosterSent(name){
+  const id = rosterKey(name);
+  return loadRoster().some(e => e.id === id && e.sent);
+}
+function rosterMarkSent(name){
+  const id   = rosterKey(name);
+  const list = loadRoster();
+  const hit  = list.find(e => e.id === id);
+  if(hit){ hit.sent = true; saveRoster(list); }
+}
+/* The nickname turned out to belong to somebody else, so this browser should
+   not go on claiming it either. */
+function rosterRemove(name){
+  const id = rosterKey(name);
+  saveRoster(loadRoster().filter(e => e.id !== id));
+}
+
 /* ---- sending a Mii on for real ----
    The plaza is fed by one file per Mii in _data/plaza/, so a submission is just
    that file's contents. The studio copies it to the clipboard and the visitor
@@ -1043,4 +1096,30 @@ function rosterAdd(m){
 function submissionCode(m){
   const name = String(m.name || '').trim();
   return JSON.stringify({id: rosterKey(name), name, mii: m}, null, 2);
+}
+
+/* ---- the postbox ----
+   A small service that takes a Mii and opens the pull request itself, so a
+   visitor needs nothing but this page.  Empty means there is no postbox and the
+   studio hands back the code to paste instead — which is also what happens when
+   the postbox is unreachable, so the send button never simply fails.
+   Deploying one: see plaza-api/README.md. */
+const PLAZA_API = '';
+
+async function sendToPlaza(m){
+  if(!PLAZA_API) return {ok:false, reason:'nopost'};
+  try{
+    const res  = await fetch(PLAZA_API, {
+      method : 'POST',
+      headers: {'content-type':'application/json'},
+      body   : JSON.stringify({name: String(m.name || '').trim(), mii: m})
+    });
+    const data = await res.json().catch(()=>null);
+    if(res.ok && data && data.ok) return {ok:true, url: data.url};
+    return {ok:false,
+            reason : (data && data.reason)  || 'http',
+            message: (data && data.message) || 'The Plaza postbox did not answer.'};
+  }catch{
+    return {ok:false, reason:'offline', message:'Could not reach the Plaza postbox.'};
+  }
 }

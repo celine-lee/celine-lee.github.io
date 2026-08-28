@@ -1,3 +1,16 @@
 theme: jekyll-theme-minimal
 title: Celine's homepage
 description: Celine Lee's personal website.
+
+# The Plaza postbox is deployed to Vercel from this folder, not served by the
+# site.  Jekyll's own defaults are repeated because naming `exclude` replaces
+# them rather than adding to them.
+exclude:
+  - plaza-api
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/

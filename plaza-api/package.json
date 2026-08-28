@@ -1,0 +1,6 @@
+{
+  "name": "mii-plaza-api",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" }
+}
