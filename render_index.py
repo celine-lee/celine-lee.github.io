@@ -144,7 +144,7 @@ html_output = """<html>
     </ul>
     
     <h2>Misc.</h2>
-      <ul><a href="library.html">Libary of writings, zines, some arts and crafts.</a></ul>
+      <ul><a href="library.html">Library of writings, zines, some arts and crafts.</a></ul>
       <ul>A running <a href="party.html">list of what-to-do ideas when you need some inspiration</a>. Use them if that's fun for you</ul>
       <ul>I like <a href="soup.html">soup a lot</a>.</ul>
       <ul><a href="mii_channel_knockoff/index.html">Join the channel</a>.</ul>
