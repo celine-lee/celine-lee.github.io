@@ -1,0 +1,12 @@
+---
+layout: null
+---
+{% comment %}
+  The plaza roster, built by Jekyll from _data/plaza/*.json — one file per Mii.
+  Sending a Mii from the studio opens a pull request adding a file to that
+  folder; merging the pull request puts them in the plaza for everybody.
+  Delete a Mii by deleting their file.
+{% endcomment %}
+[{% for item in site.data.plaza %}{% unless forloop.first %},{% endunless %}
+{{ item[1] | jsonify }}{% endfor %}
+]

@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mii Plaza</title>
+<style>
+:root{
+  --ink:#33383c;
+  --accent:#d97a45; --accent-d:#a9521c;
+  --floor:#ded9cd;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;overflow:hidden;
+  background:var(--floor);
+  color:var(--ink);
+  font-family:"Avenir Next",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:14px;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+
+#stage{position:fixed;inset:0;overflow:hidden;background:var(--floor);touch-action:none}
+#floor,#crowd{position:absolute;inset:0;width:100%;height:100%;display:block}
+#crowd .mii{cursor:grab}
+#crowd .mii.carried{cursor:grabbing}
+#stage.carrying{cursor:grabbing}
+
+/* The one control on the page: back to the Mii creator. A plain link, so it
+   works even if the script never runs. */
+.back{
+  position:fixed;left:18px;top:18px;z-index:5;
+  text-decoration:none;cursor:pointer;
+  width:60px;height:60px;padding:0;border-radius:50%;
+  display:grid;place-items:center;color:#5b666b;
+  background:rgba(255,255,255,.82);border:1px solid rgba(120,132,136,.5);
+  box-shadow:0 3px 10px rgba(40,52,58,.18);
+  transition:background .12s, transform .1s, color .12s;
+}
+.back svg{width:32px;height:32px}
+.back:hover{background:#fff;color:#333a3d}
+.back:active{transform:scale(.94)}
+
+/* ---------- nameplate ---------- */
+.plate{
+  position:absolute;z-index:4;pointer-events:none;
+  transform:translate(-50%,-100%);
+  padding:4px 11px;border-radius:999px;white-space:nowrap;
+  font-size:13px;font-weight:800;letter-spacing:.01em;color:#3b4449;
+  background:rgba(255,255,255,.94);border:1px solid rgba(120,132,136,.5);
+  box-shadow:0 2px 7px rgba(40,52,58,.2);
+  opacity:0;transition:opacity .14s;
+}
+.plate.on{opacity:1}
+
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="floor" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  <svg id="crowd" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="plate" id="plate" aria-live="polite"></div>
+</div>
+
+<a class="back" href="index.html" title="Back to the Mii creator" aria-label="Back to the Mii creator"
+  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+    stroke-linecap="round" stroke-linejoin="round"
+  ><path d="M10.5 5L4 12l6.5 7"/><path d="M4.6 12H20"/></svg
+></a>
+
+<script src="mii.js"></script>
+<script>
+/* ============================================================
+   MII PLAZA
+   The stage is the visible 70% of a larger roaming area, so Miis
+   can wander off-screen for a while and come back.
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const floorEl = $('#floor'), crowdEl = $('#crowd');
+
+const VISIBLE = 0.7;      // share of the roam area you can actually see
+const SEED    = 20260827; // only for where the crowd starts standing
+
+/* ---------- the swirling checker floor ----------
+   Rings grow geometrically so every tile stays roughly square, and each ring
+   is rotated a little further than the last, which curves the radial seams
+   into the spiral the Wii plaza floor has. */
+function drawFloor(w, h){
+  const cx = w/2, cy = h*0.52;
+  const R  = Math.hypot(Math.max(cx, w-cx), Math.max(cy, h-cy)) * 1.12;
+  const S  = 24;                                  // tiles per ring
+  const STEP  = 2*Math.PI/S;
+  const GROW  = 1 + STEP*0.84;                    // ring thickness ~ tile width
+  const TWIST = STEP * 0.40;                      // how far each ring is turned
+  const GAP   = 2.2;                              // seam width, in pixels
+
+  const pt = (r,a) => `${(cx + r*Math.cos(a)).toFixed(1)} ${(cy + r*Math.sin(a)).toFixed(1)}`;
+  let out = `<rect width="${w}" height="${h}" fill="var(--floor)"/>`;
+  let light = '', dark = '';
+
+  for(let ring = 0, r0 = 4.5; r0 < R; ring++, r0 *= GROW){
+    const r1 = r0*GROW, ri0 = r0 + GAP/2, ri1 = r1 - GAP/2;
+    if(ri1 <= ri0) continue;
+    const pa0 = GAP/(2*ri0), pa1 = GAP/(2*ri1);   // angular padding for a constant seam
+    for(let k = 0; k < S; k++){
+      const a0 = k*STEP + ring*TWIST, a1 = a0 + STEP;
+      const b0 = a0 + TWIST,          b1 = a1 + TWIST;
+      const d = `M ${pt(ri0, a0+pa0)} A ${ri0.toFixed(1)} ${ri0.toFixed(1)} 0 0 1 ${pt(ri0, a1-pa0)}`
+              + ` L ${pt(ri1, b1-pa1)} A ${ri1.toFixed(1)} ${ri1.toFixed(1)} 0 0 0 ${pt(ri1, b0+pa1)} Z`;
+      if((ring + k) % 2) dark += `<path d="${d}"/>`; else light += `<path d="${d}"/>`;
+    }
+  }
+  out += `<g fill="#fcfbf7">${light}</g><g fill="#e7e3d7">${dark}</g>`;
+  floorEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  floorEl.innerHTML = out;
+}
+
+/* ---------- the crowd ---------- */
+let W = 0, H = 0, MX = 0, MY = 0;        // stage size, and how far the roam area over-hangs it
+let people = [];
+
+function layout(){
+  W = window.innerWidth; H = window.innerHeight;
+  MX = W * (1/VISIBLE - 1) / 2;
+  MY = H * (1/VISIBLE - 1) / 2;
+  drawFloor(W, H);
+  crowdEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+/* Miis stand further back the higher up the stage they are, so the top of the
+   plaza reads as depth rather than as a wall of the same-sized people. */
+const GROUND_TOP = () => -MY + H*0.12;
+const GROUND_BOT = () => H + MY;
+function depthAt(y){
+  const t = (y - GROUND_TOP()) / (GROUND_BOT() - GROUND_TOP());
+  return 0.72 + 0.5 * Math.min(1, Math.max(0, t));
+}
+
+function makePerson(entry, rand){
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','mii');
+  g.dataset.id = entry.id;
+  g.innerHTML = svgMii(entry.mii);
+  crowdEl.appendChild(g);
+
+  const limbs = [...g.querySelectorAll('.mii-limb')].map(el=>{
+    const [px,py] = el.dataset.pivot.split(' ').map(Number);
+    return {el, px, py, kind: el.classList.contains('mii-armL') ? 'aL'
+                        : el.classList.contains('mii-armR') ? 'aR'
+                        : el.classList.contains('mii-legL') ? 'lL' : 'lR'};
+  });
+
+  const bottom = bodyGeom(entry.mii).bottom;
+  return {
+    id: entry.id, entry, g, limbs, bottom,
+    bob: g.querySelector('.mii-bob'),
+    x: -MX + rand()*(W + 2*MX),
+    y: GROUND_TOP() + rand()*(GROUND_BOT() - GROUND_TOP()),
+    dx:0, dy:0, speed:0, phase: rand()*Math.PI*2,
+    swing:0, lift:0, state:'idle', timer: rand()*2.5
+  };
+}
+
+/* A loose wander: walk a while in one direction, stop a while, pick another. */
+function retarget(p){
+  if(p.state === 'walk'){
+    p.state = 'idle';
+    p.timer = 0.7 + Math.random()*3.2;
+    p.speed = 0;
+    return;
+  }
+  p.state = 'walk';
+  p.timer = 1.2 + Math.random()*3.4;
+  p.speed = 20 + Math.random()*26;
+
+  /* Steer back toward the middle when they have drifted past the roam edge. */
+  let a = Math.random()*Math.PI*2;
+  const outX = p.x < -MX ? 1 : p.x > W + MX ? -1 : 0;
+  const outY = p.y < GROUND_TOP() ? 1 : p.y > GROUND_BOT() ? -1 : 0;
+  if(outX || outY) a = Math.atan2(outY || (Math.random()-0.5), outX || (Math.random()-0.5));
+  p.dx = Math.cos(a);
+  p.dy = Math.sin(a) * 0.55;             // the floor is shallow, so drift sideways more than up
+}
+
+function step(p, dt){
+  if(p.state === 'carry'){
+    /* Held up in the air: the limbs swing loose and the body sways. */
+    p.phase += dt * 17;
+    p.swing += (1 - p.swing) * Math.min(1, dt*8);
+    p.lift  += (1 - p.lift)  * Math.min(1, dt*7);
+    poseLimbs(p, Math.sin(p.phase)*26, Math.sin(p.phase*1.17 + 0.9)*21);
+    if(p.bob) p.bob.setAttribute('transform', `translate(0 ${(Math.sin(p.phase*0.8)*3).toFixed(2)})`);
+    place(p, Math.sin(p.phase*0.62) * 5);
+    return;
+  }
+
+  p.lift += (0 - p.lift) * Math.min(1, dt*7);
+  p.timer -= dt;
+  if(p.timer <= 0) retarget(p);
+
+  if(p.state === 'walk'){
+    p.x += p.dx * p.speed * dt;
+    p.y += p.dy * p.speed * dt;
+    p.phase += dt * (p.speed * 0.13 + 2.2);
+    p.swing += (1 - p.swing) * Math.min(1, dt*6);
+  }else{
+    p.phase += dt * 1.6;
+    p.swing += (0 - p.swing) * Math.min(1, dt*5);
+  }
+
+  const s = p.swing, swing = Math.sin(p.phase);
+  poseLimbs(p, swing * 15 * s, swing * 17 * s);
+  /* a small bounce on each step, and a slow breath while standing still */
+  const bob = -Math.abs(Math.cos(p.phase)) * 7 * s - (1-s) * Math.sin(p.phase*0.9) * 1.6;
+  if(p.bob) p.bob.setAttribute('transform', `translate(0 ${bob.toFixed(2)})`);
+  place(p, 0);
+}
+
+/* arm swings one way, the leg on the same side swings the other */
+function poseLimbs(p, arm, leg){
+  for(const L of p.limbs){
+    const a = L.kind === 'aL' ?  arm : L.kind === 'aR' ? -arm
+            : L.kind === 'lL' ? -leg :  leg;
+    L.el.setAttribute('transform', `rotate(${a.toFixed(2)} ${L.px} ${L.py})`);
+  }
+}
+
+function heightOf(p){ return scaleOf(p) * (p.bottom - 40); }
+function scaleOf(p){ return depthAt(p.y) * (1 + 0.16*p.lift) * (H * 0.17) / (p.bottom - 40); }
+function place(p, rot){
+  const sc = scaleOf(p);
+  p.g.setAttribute('transform',
+    `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${rot.toFixed(2)})`
+    + ` scale(${sc.toFixed(4)}) translate(${-CX} ${-p.bottom})`);
+}
+
+/* Painter's order: whoever is standing further back is drawn first. */
+let sortT = 0;
+function resort(){
+  const order = people.slice().sort((a,b)=>a.y-b.y);
+  for(const p of order) if(p !== carried) crowdEl.appendChild(p.g);
+  if(carried) crowdEl.appendChild(carried.g);
+}
+
+let last = 0;
+function frame(now){
+  const dt = Math.min(0.05, (now - last)/1000 || 0);
+  last = now;
+  for(const p of people) step(p, dt);
+  trackPlate(now);
+  if(now - sortT > 400){ sortT = now; resort(); }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- nameplate ---------- */
+const plateEl = $('#plate');
+let plateFor = null, plateUntil = 0;
+
+function showPlate(p){
+  if(!p){ plateFor = null; plateEl.classList.remove('on'); return; }
+  plateFor = p;
+  plateUntil = performance.now() + 5000;
+  plateEl.textContent = p.entry.name || 'Mii';
+  plateEl.classList.add('on');
+}
+function trackPlate(now){
+  if(!plateFor) return;
+  if(now > plateUntil && plateFor.state !== 'carry'){ showPlate(null); return; }
+  const p = plateFor;
+  plateEl.style.left = p.x.toFixed(1) + 'px';
+  plateEl.style.top  = (p.y - heightOf(p) - 10).toFixed(1) + 'px';
+}
+
+/* ---------- press and hold to pick a Mii up ---------- */
+const HOLD_MS = 220;
+let held = null, holdTimer = 0, carried = null;
+
+function pickUp(p){
+  carried = p;
+  p.state = 'carry';
+  p.swing = 1;
+  p.g.classList.add('carried');
+  $('#stage').classList.add('carrying');
+  crowdEl.appendChild(p.g);                 // whoever is held is held in front
+  showPlate(p);
+}
+function dropCarried(){
+  if(!carried) return;
+  const p = carried;
+  carried = null;
+  p.g.classList.remove('carried');
+  $('#stage').classList.remove('carrying');
+  p.state = 'idle';
+  p.timer = 0.5 + Math.random()*1.5;
+  p.y = Math.min(GROUND_BOT(), Math.max(GROUND_TOP(), p.y));
+  plateUntil = performance.now() + 5000;
+  return p;
+}
+
+function carryTo(cx, cy){
+  if(!carried) return;
+  carried.x = cx;
+  carried.y = cy + heightOf(carried) * 0.72;   // held from above, feet dangling
+}
+
+crowdEl.addEventListener('pointerdown', e=>{
+  const g = e.target.closest('.mii'); if(!g) return;
+  const p = people.find(x => x.g === g); if(!p) return;
+  e.preventDefault();
+  crowdEl.setPointerCapture(e.pointerId);
+  held = p;
+  showPlate(p);
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(()=>{ if(held === p){ pickUp(p); carryTo(e.clientX, e.clientY); } }, HOLD_MS);
+});
+
+crowdEl.addEventListener('pointermove', e=>{
+  if(carried){ carryTo(e.clientX, e.clientY); return; }
+  if(held) return;                              // a press that has not become a carry yet
+  const g = e.target.closest('.mii');
+  const p = g && people.find(x => x.g === g);
+  if(p && p !== plateFor) showPlate(p);
+});
+
+crowdEl.addEventListener('pointerleave', ()=>{ if(!carried && plateFor) plateUntil = Math.min(plateUntil, performance.now() + 900); });
+
+function endPointer(){
+  clearTimeout(holdTimer);
+  held = null;
+  dropCarried();
+}
+crowdEl.addEventListener('pointerup', endPointer);
+crowdEl.addEventListener('pointercancel', endPointer);
+
+
+/* ---------- go ---------- */
+layout();
+loadCommitted().then(()=>{
+  const rand = rngFrom(SEED ^ 0x9e37);
+  people = mergedRoster().map(entry => makePerson(entry, rand));
+  resort();
+  requestAnimationFrame(now=>{ last = now; frame(now); });
+});
+
+let resizeT = 0;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeT);
+  resizeT = setTimeout(()=>{
+    const ox = W, oy = H;
+    layout();
+    for(const p of people){ p.x *= W/ox || 1; p.y *= H/oy || 1; }
+  }, 150);
+});
+</script>
+</body>
+</html>
