@@ -1015,9 +1015,16 @@ function normEntry(e, committed){
 
 /* Falls back to an empty list when plaza.json cannot be read — opening the
    page straight off disk, say — so the plaza still works locally. */
+/* GitHub Pages serves the roster with a ten-minute max-age, so for that long
+   after a merge the edge keeps handing back the old one and a newly admitted
+   Mii is nowhere to be seen.  cache:'no-cache' only revalidates, and the edge
+   answers the revalidation from the very copy that is stale — so ask for a URL
+   it has not cached instead.  A minute's granularity keeps a page that loads
+   the roster twice from fetching it twice. */
 async function loadCommitted(url = PLAZA_FILE){
   try{
-    const res = await fetch(url, {cache:'no-cache'});
+    const bust = `${url}${url.includes('?') ? '&' : '?'}v=${Math.floor(Date.now() / 60000)}`;
+    const res = await fetch(bust, {cache:'no-cache'});
     if(!res.ok) throw new Error(res.status);
     const data = await res.json();
     COMMITTED = (Array.isArray(data) ? data : []).map(e => normEntry(e, true)).filter(Boolean);
