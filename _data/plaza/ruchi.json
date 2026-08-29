@@ -1,0 +1,102 @@
+{
+  "id": "ruchi",
+  "name": "Ruchi",
+  "mii": {
+    "favorite": false,
+    "mingle": true,
+    "birthday": {
+      "m": 3,
+      "d": 11
+    },
+    "skin": 4,
+    "face": {
+      "shape": 0,
+      "size": 0.99,
+      "width": 1.02,
+      "jaw": 1.1
+    },
+    "hair": {
+      "style": 12,
+      "color": 0,
+      "y": 16,
+      "size": 0.975,
+      "flip": true
+    },
+    "brows": {
+      "style": 7,
+      "color": 0,
+      "y": 17,
+      "spacing": 5.5,
+      "size": 0.895,
+      "rot": 1
+    },
+    "eyes": {
+      "style": 10,
+      "color": 0,
+      "y": 0,
+      "spacing": 5,
+      "size": 1.06,
+      "stretch": 1,
+      "rot": 0
+    },
+    "nose": {
+      "style": 5,
+      "x": -1,
+      "y": 1,
+      "size": 1.085,
+      "width": 0.92
+    },
+    "mouth": {
+      "style": 9,
+      "color": 0,
+      "x": 0,
+      "y": -0.5,
+      "size": 0.95,
+      "stretch": 1.05
+    },
+    "beard": {
+      "must": 0,
+      "style": 0,
+      "color": 0,
+      "size": 1,
+      "y": 0
+    },
+    "glasses": {
+      "style": 3,
+      "color": 1,
+      "y": 8,
+      "size": 1.16
+    },
+    "hat": {
+      "style": 5,
+      "color": 5
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": false,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": false,
+      "dropR": false,
+      "necklace": false,
+      "choker": false
+    },
+    "mole": {
+      "on": true,
+      "color": 0,
+      "x": -92,
+      "y": 7,
+      "size": 0.6
+    },
+    "body": {
+      "color": 5,
+      "pants": 3,
+      "shoes": 0,
+      "dress": false,
+      "build": 1.005,
+      "height": 1
+    },
+    "name": "Ruchi"
+  }
+}
