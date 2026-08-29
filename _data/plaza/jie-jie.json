@@ -1,0 +1,102 @@
+{
+  "id": "jie jie",
+  "name": "Jie jie",
+  "mii": {
+    "favorite": true,
+    "mingle": true,
+    "birthday": {
+      "m": 10,
+      "d": 15
+    },
+    "skin": 5,
+    "face": {
+      "shape": 8,
+      "size": 0.966,
+      "width": 1.077,
+      "jaw": 0.883
+    },
+    "hair": {
+      "style": 0,
+      "color": 0,
+      "y": 0.677,
+      "size": 1.074,
+      "flip": false
+    },
+    "brows": {
+      "style": 4,
+      "color": 0,
+      "y": -8.51,
+      "spacing": -1.039,
+      "size": 1.09,
+      "rot": -6.068
+    },
+    "eyes": {
+      "style": 5,
+      "color": 0,
+      "y": 6.541,
+      "spacing": 1.553,
+      "size": 1.115,
+      "stretch": 1.025,
+      "rot": 2.413
+    },
+    "nose": {
+      "style": 2,
+      "x": -3.753,
+      "y": -6.131,
+      "size": 1.056,
+      "width": 1.109
+    },
+    "mouth": {
+      "style": 7,
+      "color": 2,
+      "x": -0.18,
+      "y": 11.13,
+      "size": 0.908,
+      "stretch": 0.899
+    },
+    "beard": {
+      "must": 0,
+      "style": 0,
+      "color": 1,
+      "size": 1.105,
+      "y": 4.312
+    },
+    "glasses": {
+      "style": 2,
+      "color": 1,
+      "y": 4.796,
+      "size": 1.067
+    },
+    "hat": {
+      "style": 3,
+      "color": 2
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": false,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": false,
+      "dropR": false,
+      "necklace": false,
+      "choker": false
+    },
+    "mole": {
+      "on": false,
+      "color": 1,
+      "x": 17.662,
+      "y": -34.916,
+      "size": 1.072
+    },
+    "body": {
+      "color": 11,
+      "pants": 3,
+      "shoes": 0,
+      "dress": true,
+      "build": 0.993,
+      "height": 1.036
+    },
+    "name": "Jie jie"
+  }
+}
