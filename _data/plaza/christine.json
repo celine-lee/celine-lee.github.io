@@ -1,6 +1,6 @@
 {
-  "id": "jie jie",
-  "name": "Jie jie",
+  "id": "christine",
+  "name": "Christine",
   "mii": {
     "beard": {
       "must": 0,
@@ -25,9 +25,9 @@
       "cartR": false,
       "studL": false,
       "studR": false,
-      "dropL": true,
-      "dropR": true,
-      "necklace": false,
+      "dropL": false,
+      "dropR": false,
+      "necklace": true,
       "choker": false
     },
     "mole": {
@@ -37,33 +37,33 @@
       "y": 0,
       "size": 1
     },
-    "name": "Jie jie",
+    "name": "Christine",
     "favorite": true,
     "mingle": true,
     "birthday": {
-      "m": 10,
-      "d": 15
+      "m": 9,
+      "d": 19
     },
     "skin": 2,
     "face": {
-      "shape": 0,
-      "size": 1,
+      "shape": 1,
+      "size": 0.98,
       "width": 1.0,
-      "jaw": 0.98
+      "jaw": 1.0
     },
     "hair": {
-      "style": 30,
+      "style": 11,
       "color": 0,
       "y": 0,
-      "size": 1.02,
+      "size": 1.0,
       "flip": false
     },
     "brows": {
-      "style": 7,
+      "style": 5,
       "color": 0,
-      "y": 3,
+      "y": 4,
       "spacing": 1,
-      "size": 0.92,
+      "size": 0.9,
       "rot": 0
     },
     "eyes": {
@@ -71,7 +71,7 @@
       "color": 0,
       "y": 0,
       "spacing": 1,
-      "size": 1.04,
+      "size": 1.02,
       "stretch": 1,
       "rot": 0
     },
@@ -79,24 +79,24 @@
       "style": 0,
       "x": 0,
       "y": 2,
-      "size": 0.85,
-      "width": 0.92
+      "size": 0.86,
+      "width": 0.93
     },
     "mouth": {
-      "style": 3,
+      "style": 0,
       "color": 1,
       "x": 0,
-      "y": 4,
-      "size": 1.0,
-      "stretch": 1.06
+      "y": 3,
+      "size": 0.95,
+      "stretch": 1.05
     },
     "body": {
-      "color": "#d4849a",
+      "color": "#aecbe8",
       "pants": 3,
       "shoes": 0,
       "dress": true,
       "build": 0.96,
-      "height": 1.0
+      "height": 0.98
     }
   }
 }

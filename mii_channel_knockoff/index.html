@@ -289,7 +289,6 @@ button.field:active{background:#e8e5e0}
       </div>
       <div class="stage-bar">
         <button class="iconbtn" id="btnRandom" title="Surprise me" aria-label="Surprise me"></button>
-        <button class="iconbtn" id="btnReset" title="Reset" aria-label="Reset"></button>
         <button class="iconbtn" id="btnSave" title="Save PNG" aria-label="Save PNG"></button>
         <button class="iconbtn go" id="btnExport" title="Send to the Plaza"
           aria-label="Send to the Plaza"></button>
@@ -586,7 +585,7 @@ const TOG_IC = {'hair.flip':SI.flip, 'mole.on':IC.mole, 'body.dress':SI.dress};
 function thumb(path, idx, view, selected){
   const t = structuredClone(M);
   set(t, path, idx);
-  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1)}</svg>`;
+  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1, path.split('.')[0])}</svg>`;
 }
 
 const esc = v => String(v==null?'':v).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -639,7 +638,7 @@ function jewelThumb(path, view, selected){
   set(t, path, true);
   t.hair.style = 0;                 // bare head, or hair hides the ears in the tile
   t.hat.style  = 0;
-  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1)}</svg>`;
+  return `<svg viewBox="${view}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svgMii(t, selected ? 2 : 1, 'jewel')}</svg>`;
 }
 
 function drawTabs(){
@@ -819,7 +818,6 @@ panelEl.addEventListener('change', e=>{
 const ri = n => Math.floor(Math.random()*n);
 const rf = (a,b) => Math.round((a + Math.random()*(b-a)) * 1000) / 1000;
 $('#btnRandom').innerHTML = SI.dice;
-$('#btnReset').innerHTML  = SI.undo;
 $('#btnSave').innerHTML   = SI.save;
 $('#btnExport').innerHTML = SI.send;
 $('#btnPlaza').innerHTML  = SI.people;
@@ -963,12 +961,6 @@ $('#btnRandom').addEventListener('click', ()=>{
   M.body.pants = DEFAULT().body.pants;
   M.body.shoes = DEFAULT().body.shoes;
   drawAll();
-});
-
-$('#btnReset').addEventListener('click', ()=>{
-  if(!confirm('Reset this Mii back to the default?')) return;
-  const keep = {name:M.name, favorite:M.favorite, mingle:M.mingle, birthday:M.birthday};
-  M = Object.assign(DEFAULT(), keep); drawAll();
 });
 
 /* ---------- export ---------- */

@@ -258,24 +258,6 @@ const HAIRS = [
      </g>`},
 
   /* --- two-strand twists fanning out of the crown --- */
-  {n:'Twists', hl:184,
-   front:c=>{
-     let s = '';
-     const cx = 256, cy = 210, N = 15;
-     for(let i=0;i<N;i++){
-       const a  = Math.PI*1.05 + i * (Math.PI*0.90/(N-1));
-       const r1 = 100 + ((i*5) % 3) * 5;
-       const x0 = cx + Math.cos(a)*40, y0 = cy + Math.sin(a)*40;
-       const x1 = cx + Math.cos(a)*r1, y1 = cy + Math.sin(a)*r1;
-       const d  = `M ${x0.toFixed(1)} ${y0.toFixed(1)} L ${x1.toFixed(1)} ${y1.toFixed(1)}`;
-       s += `<path d="${d}" stroke="${c}" stroke-width="13" stroke-linecap="round" fill="none"/>`
-          + `<path d="${d}" stroke="${shade(c,.13)}" stroke-width="4.6" stroke-linecap="round"
-               stroke-dasharray="7 9" fill="none"/>`;
-     }
-     return `<path d="${FADE}" fill="${shade(c,.2)}"/>
-       <path d="${CAP}" fill="${c}"/>${s}`;
-   }},
-
   /* --- short locs, cropped just past the skull --- */
   {n:'Short Locs', hl:184,
    front:c=>{
@@ -414,6 +396,52 @@ const HAIRS = [
          C 358 214, 336 184, 256 184 C 176 184, 154 214, 146 268 Z" fill="${c}"/>
        <g fill="${c}">${crown}${side}</g>`;
    }}
+,
+
+  /* --- long and centre parted, one soft layer breaking across each side --- */
+  {n:'Layered', hl:158,
+   back:c=>`<path d="M 150 206 C 132 310, 138 434, 156 500 L 356 500
+     C 374 434, 380 310, 362 206 Z" fill="${shade(c,-.07)}"/>
+     <path d="M 152 202 C 134 306, 138 428, 156 496 L 212 496 C 196 424, 192 304, 198 232 Z
+              M 360 202 C 378 306, 374 428, 356 496 L 300 496 C 316 424, 320 304, 314 232 Z" fill="${c}"/>`,
+   front:c=>{
+     /* Tapered to a point up inside the cap, so the lock falls out of the hair
+        instead of starting at a flat edge halfway down the cheek. */
+     const side = `<path d="M 170 188 C 154 224, 149 302, 156 378
+       C 160 406, 166 420, 172 428 C 180 394, 186 318, 184 250
+       C 181 214, 176 196, 170 188 Z" fill="${shade(c,.1)}"/>`;
+     const mirror = d => `<g transform="translate(512,0) scale(-1,1)">${d}</g>`;
+     return `<path d="M 142 330 C 132 164, 190 98, 256 98 C 322 98, 380 164, 370 330
+       C 362 252, 350 210, 326 196 C 302 184, 280 190, 256 190
+       C 232 190, 210 184, 186 196 C 162 210, 150 252, 142 330 Z" fill="${c}"/>
+       <path d="M 256 100 L 256 190" stroke="${shade(c,-.16)}" stroke-width="5"
+         stroke-linecap="round" fill="none"/>` + side + mirror(side);
+   }},
+
+  /* --- two long tight plaits either side of a hard centre parting --- */
+  {n:'Braids', hl:164,
+   mid:c=>{
+     const plait = (bx, dir) => {
+       /* Both ties overlap the strands they hold, or they read as floating. */
+       let s = `<rect x="${bx-19}" y="296" width="38" height="22" rx="9" fill="${shade(c,-.2)}"/>`;
+       for(let i=0;i<12;i++){
+         const y  = 326 + i*17;
+         const rx = 19 - i*0.4;                      // barely tapers: a tight, even plait
+         const t  = (i % 2 ? 1 : -1) * dir;
+         const cx = bx + t*4;
+         s += `<ellipse cx="${cx.toFixed(1)}" cy="${y}" rx="${rx.toFixed(1)}" ry="10.5"
+                 transform="rotate(${t*19} ${cx.toFixed(1)} ${y})"
+                 fill="${i % 2 ? shade(c,-.13) : c}"/>`;
+       }
+       return s + `<rect x="${bx-12}" y="516" width="24" height="13" rx="6.5" fill="${shade(c,-.2)}"/>`;
+     };
+     return plait(150, 1) + plait(362, -1);
+   },
+   front:c=>`<path d="M 140 320 C 130 160, 190 96, 256 96 C 322 96, 382 160, 372 320
+     C 366 250, 354 206, 330 192 C 304 178, 280 186, 256 186
+     C 232 186, 208 178, 182 192 C 158 206, 146 250, 140 320 Z" fill="${c}"/>
+     <path d="M 256 98 L 256 186" stroke="${shade(c,-.2)}" stroke-width="5.5"
+       stroke-linecap="round" fill="none"/>`}
 ];
 
 /* ============================================================
@@ -422,6 +450,10 @@ const HAIRS = [
    The right-hand copy is drawn with scale(-1,1) so asymmetric
    styles mirror correctly, exactly like the real editor.
    ============================================================ */
+
+/* Full-colour render, or one of the flat picker tiles?  The tiles knock #fff
+   back out to nothing, so anything tinted has to give way to white in them. */
+const tint = hex => LINE === INK_BASE ? hex : '#fff';
 
 const EYES = [
   {n:'Default', d:c=>`<ellipse rx="21" ry="15.5" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
@@ -479,7 +511,21 @@ const EYES = [
     <circle cy="1" r="9.6" fill="${c}"/><circle cy="1" r="4.6" fill="#221c17"/>
     <circle cx="-4.6" cy="-4.6" r="3.2" fill="#fff" opacity=".92"/>
     <path d="M -21 -10 L -30 -18 M -14 -14 L -19 -24 M -5 -16 L -7 -26"
-      stroke="${LINE}" stroke-width="3.4" stroke-linecap="round" fill="none"/>`}
+      stroke="${LINE}" stroke-width="3.4" stroke-linecap="round" fill="none"/>`},
+
+  /* --- a closed upper arch over a bare dot: no sclera at all --- */
+  {n:'Arch', d:c=>`<path d="M -19 -3 Q 0 -23 19 -3" fill="none" stroke="${LINE}"
+    stroke-width="5" stroke-linecap="round"/>
+    <circle cy="10" r="6" fill="${LINE}"/><circle cy="10" r="3.1" fill="${c}"/>`},
+
+  /* --- brimming with tears, one about to run down the outer cheek --- */
+  {n:'Teary', d:c=>`<ellipse rx="20" ry="18.5" fill="#fff" stroke="${LINE}" stroke-width="3.4"/>
+    <circle cy="2" r="13.5" fill="${c}"/><circle cy="2" r="6.6" fill="#221c17"/>
+    <path d="M -13 2 C -8 11, 8 11, 13 2 C 12 13, -12 13, -13 2 Z" fill="${tint('#bfe6f7')}" opacity=".92"/>
+    <ellipse cx="-6.5" cy="-7" rx="6" ry="5" fill="#fff"/>
+    <circle cx="6.5" cy="7.5" r="3.2" fill="#fff" opacity=".9"/>
+    <path d="M -13 21 L -7.5 32 A 5.5 5.5 0 1 1 -18.5 32 Z"
+      fill="${tint('#a5dcf3')}" stroke="${LINE}" stroke-width="2.4" stroke-linejoin="round"/>`}
 ];
 
 const BROWS = [
@@ -524,9 +570,6 @@ const MOUTHS = [
     stroke-width="5.2" stroke-linecap="round"/>`},
   {n:'Grin',    d:c=>`<path d="M -31 -7 L 31 -7 Q 27 20 0 22 Q -27 20 -31 -7 Z" fill="${LINE}"/>
     <path d="M -27 -4 L 27 -4 L 25 5 L -25 5 Z" fill="#fff"/>`},
-  {n:'Open',    d:c=>`<ellipse rx="23" ry="17" fill="${LINE}"/>
-    <path d="M -20 -13 L 20 -13 L 19 -4 L -19 -4 Z" fill="#fff"/>
-    <ellipse cy="10" rx="11.5" ry="6" fill="${c}"/>`},
   {n:'Small O',  d:c=>`<ellipse rx="10" ry="12" fill="${LINE}"/><ellipse rx="6" ry="7.5" cy="2" fill="${c}"/>`},
   {n:'Smirk',   d:c=>`<path d="M -24 2 Q 2 12 26 -8" fill="none" stroke="${LINE}"
     stroke-width="5.2" stroke-linecap="round"/>`},
@@ -764,7 +807,29 @@ function bodyGeom(m){
    ============================================================ */
 /* The starter Mii: long black hair with a blunt fringe, cream top, and the
    rust trousers the Favorite colour was sampled from. */
+/* What the studio opens on: a plain Mii with nothing picked out yet, so a first
+   visit starts on a blank slate rather than on somebody else's face. */
 const DEFAULT = () => ({
+  name:'', favorite:false, mingle:true,
+  birthday:{m:1, d:1}, skin:2,
+  face   :{shape:0, size:1, width:1, jaw:1},
+  hair   :{style:0, color:0, y:0, size:1, flip:false},
+  brows  :{style:0, color:0, y:0, spacing:1, size:1, rot:0},
+  eyes   :{style:0, color:0, y:0, spacing:1, size:1, stretch:1, rot:0},
+  nose   :{style:0, x:0, y:0, size:1, width:1},
+  mouth  :{style:0, color:0, x:0, y:0, size:1, stretch:1},
+  beard  :{must:0, style:0, color:0, size:1, y:0},
+  glasses:{style:0, color:0, y:0, size:1},
+  hat    :{style:0, color:11},
+  jewel  :{color:0, cartL:false, cartR:false, studL:false, studR:false,
+           dropL:false, dropR:false, necklace:false, choker:false},
+  mole   :{on:false, color:0, x:0, y:0, size:1},
+  body   :{color:10, pants:3, shoes:0, dress:false, build:1, height:1}
+});
+
+/* Celine, who used to be that opening face.  She is still needed: the Plaza
+   falls back to her when plaza.json cannot be read, so it is never empty. */
+const CELINE = () => ({
   name:'Celine', favorite:true, mingle:true,
   birthday:{m:10, d:15}, skin:2,
   face   :{shape:0, size:1, width:1.02, jaw:1},
@@ -789,7 +854,7 @@ let uidN = 0;
 /* ============================================================
    RENDER
    ============================================================ */
-function svgMii(m, mono){
+function svgMii(m, mono, focus){
   const uid = 'u'+(uidN++);
   const g   = faceGeom(m);
   const inv = mono === 2;                       // white line art, for a selected tile
@@ -940,6 +1005,9 @@ function svgMii(m, mono){
   const hairSY = m.hair.size * Math.max(1, fit * 0.88);
   const hairT  = `translate(${CX},${HAIR_ANCHOR+m.hair.y}) scale(${m.hair.flip?-hairSX:hairSX},${hairSY}) translate(${-CX},${-HAIR_ANCHOR})`;
   const hairBack  = hair.back  ? `<g transform="${hairT}">${hair.back(hc)}</g>`  : '';
+  /* Drawn inside the head but ahead of the ears, so a plait can be tucked behind
+     the ear and still hang down over the shoulder. */
+  const hairMid   = hair.mid   ? `<g transform="${hairT}">${hair.mid(hc)}</g>`   : '';
   const hairFront = hair.front ? `<g transform="${hairT}">${hair.front(hc)}${gloss}</g>` : '';
 
   const onEar = (sx, d) => `<g transform="translate(${CX+sx*earX},${earY}) scale(${sx},1)">${d}</g>`;
@@ -967,18 +1035,31 @@ function svgMii(m, mono){
   /* The 24 hand-drawn caps cannot each fit 12 skull shapes at every size, so the
      crown of the skull is filled in hair colour underneath. Clipped above the
      style's hairline, it is invisible except where a cap would have fallen short. */
-  const scalpOn = !!hair.front && hair.n !== 'Mohawk';
+  /* Bald draws nothing, and the Mohawk is meant to leave the sides showing, so
+     neither of them wants the crown filled in underneath. */
+  const scalpOn = !!hair.front && !hair.noScalp && hair.n !== 'Mohawk' && hair.n !== 'Bald';
   const scalpY  = hair.hl != null ? hair.hl : 180;
   const scalpCY = (g.tY + g.chY) / 2;
   const scalp = scalpOn
     ? `<g clip-path="url(#cp${uid})"><path d="${fp}" fill="${hc}"
          transform="translate(${CX},${scalpCY}) scale(1.03) translate(${-CX},${-scalpCY})"/></g>`
     : '';
-  const backHair = hairBack ? headScale(hairBack) : '';
+  /* On a picker tile, only the piece actually being chosen is drawn at full
+     strength; the rest of the Mii drops back to a faint outline so the choice
+     reads at a glance instead of competing with a whole face.  Without a focus
+     — the live Mii, the Plaza — nothing is wrapped and the output is unchanged. */
+  const lead = focus === 'skin' ? 'face' : focus;
+  const part = (name, frag) => (!lead || !frag || name === 'face') ? frag
+    : `<g${name === lead ? '' : ' opacity=".2"'}>${frag}</g>`;
+
+  const backHair = hairBack ? headScale(part('hair', hairBack)) : '';
   const head = headScale(
-      ears + face + scalp + beardClip + beardFree +
-      brows + eyes + nose + mouth + stache +
-      hairFront + earJewel + hat + glass + mole);
+      part('hair', hairMid) + part('face', ears + face) + part('hair', scalp)
+    + part('beard', beardClip + beardFree)
+    + part('brows', brows) + part('eyes', eyes) + part('nose', nose)
+    + part('mouth', mouth) + part('beard', stache)
+    + part('hair', hairFront) + part('jewel', earJewel) + part('hat', hat)
+    + part('glasses', glass) + part('mole', mole));
 
   const out = `<defs>
 <linearGradient id="sh${uid}" x1="0" y1="0" x2="0" y2="1">
@@ -1004,7 +1085,7 @@ function svgMii(m, mono){
       <clipPath id="cp${uid}"><path d="M 0 0 H 512 V 254
         C 340 254, 300 ${scalpY} 256 ${scalpY}
         C 212 ${scalpY}, 172 254, 0 254 Z"/></clipPath>
-    </defs>${groundShadow}<g class="mii-bob">${backHair}${neck}${body}${neckwear}${head}</g>`;
+    </defs>${groundShadow}<g class="mii-bob">${backHair}${part('body', neck + body + neckwear)}${head}</g>`;
   LINE = INK_BASE;                              // never leak the mono ink into the live Mii
   // only the parts library's own hard-coded paper white (sclera, teeth) is knocked out
   return inv ? out.replace(/fill="#fff(?:fff)?"(?![0-9a-f])/gi, 'fill="none"') : out;
@@ -1127,7 +1208,7 @@ function mergedRoster(){
   /* Never show an empty plaza: if plaza.json could not be read and this
      visitor has sent nobody over, Celine stands in for it. */
   if(!out.length){
-    const mii = DEFAULT(); mii.name = 'Celine';
+    const mii = CELINE();
     out.push({id:'celine', name:'Celine', mii, committed:true});
   }
   return out;

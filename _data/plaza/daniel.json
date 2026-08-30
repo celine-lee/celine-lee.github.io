@@ -73,12 +73,12 @@
     },
     "jewel": {
       "color": 0,
-      "cartL": true,
+      "cartL": false,
       "cartR": false,
       "studL": false,
       "studR": false,
-      "dropL": true,
-      "dropR": true,
+      "dropL": false,
+      "dropR": false,
       "necklace": false,
       "choker": false
     },

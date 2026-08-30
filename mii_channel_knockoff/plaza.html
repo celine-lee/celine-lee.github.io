@@ -29,8 +29,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* The one control on the page: back to the Mii creator. A plain link, so it
    works even if the script never runs. */
-.back{
-  position:fixed;left:18px;top:18px;z-index:5;
+.back, .whistle{
+  position:fixed;z-index:5;
   text-decoration:none;cursor:pointer;
   width:60px;height:60px;padding:0;border-radius:50%;
   display:grid;place-items:center;color:#5b666b;
@@ -38,9 +38,15 @@ button{font:inherit;color:inherit;cursor:pointer}
   box-shadow:0 3px 10px rgba(40,52,58,.18);
   transition:background .12s, transform .1s, color .12s;
 }
-.back svg{width:32px;height:32px}
-.back:hover{background:#fff;color:#333a3d}
-.back:active{transform:scale(.94)}
+.back{left:18px;top:18px}
+.whistle{right:18px;bottom:18px}
+.back svg, .whistle svg{width:32px;height:32px}
+.back:hover, .whistle:hover{background:#fff;color:#333a3d}
+.back:active, .whistle:active{transform:scale(.94)}
+/* held down for as long as the crowd is falling in */
+.whistle.on{background:var(--accent);border-color:var(--accent-d);color:#fff}
+.whistle.on:hover{background:var(--accent)}
+.whistle[disabled]{cursor:default}
 
 /* ---------- nameplate ---------- */
 .plate{
@@ -68,6 +74,13 @@ button{font:inherit;color:inherit;cursor:pointer}
     stroke-linecap="round" stroke-linejoin="round"
   ><path d="M10.5 5L4 12l6.5 7"/><path d="M4.6 12H20"/></svg
 ></a>
+
+<button class="whistle" id="whistle" title="Blow the whistle" aria-label="Blow the whistle"
+  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+    stroke-linecap="round" stroke-linejoin="round"
+  ><path d="M4 8.4H11.7A5.2 5.2 0 1 1 10 11.6H4Z"/
+  ><circle cx="15.6" cy="12.8" r="1.6"/></svg
+></button>
 
 <script src="mii.js"></script>
 <script>
@@ -196,17 +209,36 @@ function step(p, dt){
   }
 
   p.lift += (0 - p.lift) * Math.min(1, dt*7);
-  p.timer -= dt;
-  if(p.timer <= 0) retarget(p);
 
-  if(p.state === 'walk'){
-    p.x += p.dx * p.speed * dt;
-    p.y += p.dy * p.speed * dt;
-    p.phase += dt * (p.speed * 0.13 + 2.2);
-    p.swing += (1 - p.swing) * Math.min(1, dt*6);
+  if(p.state === 'line'){
+    /* Called up: run for your place, then stand still in it. */
+    const ax = p.tx - p.x, ay = p.ty - p.y, d = Math.hypot(ax, ay);
+    if(d > 1.5){
+      const sp = Math.min(LINE_SPEED, 26 + d*3.2);        // ease off on the last stride
+      p.x += ax/d * sp * dt;
+      p.y += ay/d * sp * dt;
+      p.phase += dt * (sp * 0.13 + 2.2);
+      p.swing += (1 - p.swing) * Math.min(1, dt*7);
+      p.arrived = false;
+    }else{
+      p.x = p.tx; p.y = p.ty;
+      p.phase += dt * 1.6;
+      p.swing += (0 - p.swing) * Math.min(1, dt*6);
+      p.arrived = true;
+    }
   }else{
-    p.phase += dt * 1.6;
-    p.swing += (0 - p.swing) * Math.min(1, dt*5);
+    p.timer -= dt;
+    if(p.timer <= 0) retarget(p);
+
+    if(p.state === 'walk'){
+      p.x += p.dx * p.speed * dt;
+      p.y += p.dy * p.speed * dt;
+      p.phase += dt * (p.speed * 0.13 + 2.2);
+      p.swing += (1 - p.swing) * Math.min(1, dt*6);
+    }else{
+      p.phase += dt * 1.6;
+      p.swing += (0 - p.swing) * Math.min(1, dt*5);
+    }
   }
 
   const s = p.swing, swing = Math.sin(p.phase);
@@ -255,6 +287,7 @@ function frame(now){
   const dt = Math.min(0.05, (now - last)/1000 || 0);
   last = now;
   for(const p of people) step(p, dt);
+  tickWhistle(now);
   trackPlate(now);
   if(now - sortT > 400){ sortT = now; resort(); }
   requestAnimationFrame(frame);
@@ -298,7 +331,8 @@ function dropCarried(){
   carried = null;
   p.g.classList.remove('carried');
   $('#stage').classList.remove('carrying');
-  p.state = 'idle';
+  p.state = lining ? 'line' : 'idle';
+  p.arrived = false;
   p.timer = 0.5 + Math.random()*1.5;
   p.y = Math.min(GROUND_BOT(), Math.max(GROUND_TOP(), p.y));
   plateUntil = performance.now() + 5000;
@@ -340,6 +374,80 @@ function endPointer(){
 crowdEl.addEventListener('pointerup', endPointer);
 crowdEl.addEventListener('pointercancel', endPointer);
 
+
+/* ---------- the whistle ----------
+   One blow calls the whole plaza in to stand in rows, sorted by name, back row
+   first so the alphabet reads the way a class photo does.  They hold the line
+   for a few seconds and then go back to wandering. */
+const LINE_SPEED = 260;      // px/s, a good deal faster than a stroll
+const LINE_HOLD  = 5000;     // how long the rows stand once everybody is in
+const LINE_GIVEUP = 9000;    // ...and the longest anyone is waited for
+
+const whistleEl = $('#whistle');
+let lining = false, holdFrom = 0, calledAt = 0;
+
+function formation(n){
+  const cols = Math.max(3, Math.min(n, Math.round(Math.sqrt(n * 2.4))));
+  const rows = Math.ceil(n / cols);
+  const gapX = Math.min(W * 0.82 / cols, 150);
+  const backY  = H * (rows > 1 ? 0.40 : 0.60);
+  const frontY = H * 0.80;
+  const spots = [];
+  for(let i = 0; i < n; i++){
+    const r = Math.floor(i / cols);
+    const inRow = Math.min(cols, n - r*cols);        // a short last row still centres
+    const c = i - r*cols;
+    spots.push({
+      x: W/2 + (c - (inRow - 1)/2) * gapX,
+      y: rows > 1 ? backY + (frontY - backY) * (r/(rows - 1)) : backY
+    });
+  }
+  return spots;
+}
+
+function callEveryone(){
+  if(lining || !people.length) return;
+  lining = true;
+  holdFrom = 0;
+  calledAt = performance.now();
+  whistleEl.classList.add('on');
+
+  const queue = people.slice().sort((a,b)=>
+    (a.entry.name||'').localeCompare(b.entry.name||'', undefined, {sensitivity:'base'}));
+  const spots = formation(queue.length);
+  queue.forEach((p, i)=>{
+    p.tx = spots[i].x;
+    p.ty = spots[i].y;
+    p.arrived = false;
+    if(p.state !== 'carry') p.state = 'line';        // whoever is held keeps being held
+  });
+}
+
+function dismiss(){
+  lining = false;
+  whistleEl.classList.remove('on');
+  for(const p of people){
+    if(p.state !== 'line') continue;
+    p.state = 'idle';
+    p.timer = 0.2 + Math.random()*1.2;               // they break rank raggedly
+    p.arrived = false;
+  }
+}
+
+/* Watched once a frame: fall in, hold, fall out. */
+function tickWhistle(now){
+  if(!lining) return;
+  if(!holdFrom){
+    const waiting = people.filter(p => p.state === 'line');
+    if((waiting.length && waiting.every(p => p.arrived)) || now - calledAt > LINE_GIVEUP){
+      holdFrom = now;
+    }
+    return;
+  }
+  if(now - holdFrom > LINE_HOLD) dismiss();
+}
+
+whistleEl.addEventListener('click', callEveryone);
 
 /* ---------- go ---------- */
 layout();
