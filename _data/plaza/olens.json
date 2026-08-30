@@ -1,0 +1,102 @@
+{
+  "id": "olens",
+  "name": "Olens",
+  "mii": {
+    "favorite": false,
+    "mingle": true,
+    "birthday": {
+      "m": 4,
+      "d": 24
+    },
+    "skin": 1,
+    "face": {
+      "shape": 3,
+      "size": 0.9,
+      "width": 0.895,
+      "jaw": 1.055
+    },
+    "hair": {
+      "style": 15,
+      "color": 6,
+      "y": -2.5,
+      "size": 0.99,
+      "flip": false
+    },
+    "brows": {
+      "style": 7,
+      "color": 6,
+      "y": 14.5,
+      "spacing": 0,
+      "size": 0.86,
+      "rot": -1
+    },
+    "eyes": {
+      "style": 7,
+      "color": 1,
+      "y": -5.5,
+      "spacing": 2,
+      "size": 0.84,
+      "stretch": 0.7,
+      "rot": -5
+    },
+    "nose": {
+      "style": 3,
+      "x": -0.5,
+      "y": -1,
+      "size": 0.73,
+      "width": 0.85
+    },
+    "mouth": {
+      "style": 8,
+      "color": 5,
+      "x": 1,
+      "y": -3.5,
+      "size": 0.95,
+      "stretch": 1.04
+    },
+    "beard": {
+      "must": 0,
+      "style": 0,
+      "color": 4,
+      "size": 0.917,
+      "y": 2.302
+    },
+    "glasses": {
+      "style": 0,
+      "color": 7,
+      "y": -4.399,
+      "size": 1.075
+    },
+    "hat": {
+      "style": 0,
+      "color": 7
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": false,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": true,
+      "dropR": true,
+      "necklace": true,
+      "choker": true
+    },
+    "mole": {
+      "on": false,
+      "color": 0,
+      "x": -105.032,
+      "y": -12.516,
+      "size": 1.103
+    },
+    "body": {
+      "color": 11,
+      "pants": 3,
+      "shoes": 0,
+      "dress": true,
+      "build": 0.785,
+      "height": 1.15
+    },
+    "name": "Olens"
+  }
+}
