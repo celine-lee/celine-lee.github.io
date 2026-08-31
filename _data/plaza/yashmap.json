@@ -1,0 +1,102 @@
+{
+  "id": "yashmap",
+  "name": "Yashmap",
+  "mii": {
+    "favorite": false,
+    "mingle": true,
+    "birthday": {
+      "m": 1,
+      "d": 6
+    },
+    "skin": 5,
+    "face": {
+      "shape": 11,
+      "size": 0.905,
+      "width": 0.9,
+      "jaw": 0.925
+    },
+    "hair": {
+      "style": 6,
+      "color": 0,
+      "y": 0,
+      "size": 1,
+      "flip": false
+    },
+    "brows": {
+      "style": 11,
+      "color": 0,
+      "y": 22,
+      "spacing": 5,
+      "size": 0.96,
+      "rot": 1
+    },
+    "eyes": {
+      "style": 10,
+      "color": 0,
+      "y": 0,
+      "spacing": 1,
+      "size": 1,
+      "stretch": 1,
+      "rot": 0
+    },
+    "nose": {
+      "style": 0,
+      "x": 0,
+      "y": 0,
+      "size": 1,
+      "width": 1
+    },
+    "mouth": {
+      "style": 0,
+      "color": 0,
+      "x": 0,
+      "y": 0,
+      "size": 1,
+      "stretch": 1
+    },
+    "beard": {
+      "must": 0,
+      "style": 1,
+      "color": 0,
+      "size": 1,
+      "y": 0
+    },
+    "glasses": {
+      "style": 1,
+      "color": 5,
+      "y": 10.5,
+      "size": 1.11
+    },
+    "hat": {
+      "style": 0,
+      "color": 11
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": false,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": false,
+      "dropR": false,
+      "necklace": false,
+      "choker": false
+    },
+    "mole": {
+      "on": false,
+      "color": 0,
+      "x": 0,
+      "y": 0,
+      "size": 1
+    },
+    "body": {
+      "color": 10,
+      "pants": 3,
+      "shoes": 0,
+      "dress": false,
+      "build": 1.04,
+      "height": 1.145
+    },
+    "name": "Yashmap"
+  }
+}
