@@ -1,0 +1,102 @@
+{
+  "id": "e",
+  "name": "e",
+  "mii": {
+    "favorite": false,
+    "mingle": true,
+    "birthday": {
+      "m": 9,
+      "d": 19
+    },
+    "skin": 2,
+    "face": {
+      "shape": 0,
+      "size": 0.905,
+      "width": 0.945,
+      "jaw": 1.04
+    },
+    "hair": {
+      "style": 7,
+      "color": 0,
+      "y": 1,
+      "size": 1.04,
+      "flip": false
+    },
+    "brows": {
+      "style": 7,
+      "color": 2,
+      "y": 11,
+      "spacing": -1.5,
+      "size": 0.9,
+      "rot": 9
+    },
+    "eyes": {
+      "style": 12,
+      "color": 1,
+      "y": 0,
+      "spacing": 1,
+      "size": 1.02,
+      "stretch": 1,
+      "rot": 0
+    },
+    "nose": {
+      "style": 1,
+      "x": 0,
+      "y": 2,
+      "size": 0.88,
+      "width": 0.95
+    },
+    "mouth": {
+      "style": 12,
+      "color": 2,
+      "x": 0,
+      "y": 3.5,
+      "size": 1.05,
+      "stretch": 1.105
+    },
+    "beard": {
+      "must": 0,
+      "style": 0,
+      "color": 0,
+      "size": 1,
+      "y": 0
+    },
+    "glasses": {
+      "style": 0,
+      "color": 4,
+      "y": 0,
+      "size": 1.25
+    },
+    "hat": {
+      "style": 0,
+      "color": 2
+    },
+    "jewel": {
+      "color": 0,
+      "cartL": false,
+      "cartR": false,
+      "studL": false,
+      "studR": false,
+      "dropL": false,
+      "dropR": false,
+      "necklace": false,
+      "choker": false
+    },
+    "mole": {
+      "on": true,
+      "color": 1,
+      "x": -97,
+      "y": 15,
+      "size": 0.62
+    },
+    "body": {
+      "color": 4,
+      "pants": 3,
+      "shoes": 0,
+      "dress": true,
+      "build": 0.845,
+      "height": 0.945
+    },
+    "name": "e"
+  }
+}
